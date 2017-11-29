@@ -22,7 +22,7 @@ func NewSSMClient() (*SSMClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	config = nil;
+	config = nil
 	endpoint := os.Getenv("SSM_ENDPOINT")
 	if endpoint != "" {
 		config = &aws.Config{
@@ -33,7 +33,7 @@ func NewSSMClient() (*SSMClient, error) {
 	return &SSMClient{client}, nil
 }
 
-func (c *SSMClient) getParameters(path string) (map[string]string, error) {
+func (c *SSMClient) GetParametersByPath(path string) (map[string]string, error) {
 	if strings.HasSuffix(path, "/") != true {
 		path = fmt.Sprintf("%s/", path)
 	}

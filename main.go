@@ -1,19 +1,17 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
-
 func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.InfoLevel)
 }
-
 
 func main() {
 	var command string
@@ -23,17 +21,17 @@ func main() {
 	app.Name = "env-aws-params"
 	app.Usage = "Application entry-point that injects SSM Parameter Store values as Environment Variables"
 
-	app.Flags = []cli.Flag {
+	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name: "prefix, p",
-			Value: "",
-			Usage: "Key prefix that is used to retrieve the environment variables ",
+			Name:        "prefix, p",
+			Value:       "",
+			Usage:       "Key prefix that is used to retrieve the environment variables ",
 			Destination: &prefix,
 		},
 		cli.StringFlag{
-			Name: "command, c",
-			Value: "",
-			Usage: "Command",
+			Name:        "command, c",
+			Value:       "",
+			Usage:       "Command",
 			Destination: &command,
 		},
 	}
@@ -47,10 +45,10 @@ func main() {
 			os.Exit(1)
 		}
 
-		parameters, err := ssm.getParameters(prefix)
+		parameters, err := ssm.GetParametersByPath(prefix)
 		if err != nil {
 			log.Error(err)
-			os.Exit(1)
+			os.Exit(2)
 		}
 
 		for k, v := range parameters {

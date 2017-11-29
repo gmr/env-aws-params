@@ -9,7 +9,7 @@ import (
 )
 
 func RunCommand(command string, envvars []string) {
-	log.WithFields(log.Fields{"command": command},).Info("Running command")
+	log.WithFields(log.Fields{"command": command}).Info("Running command")
 	cmd := exec.Command(command)
 	cmd.Env = append(os.Environ(), envvars...)
 	out, err := cmd.Output()
