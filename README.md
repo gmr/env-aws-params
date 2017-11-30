@@ -9,3 +9,11 @@ Key / Value pairs as [Environment Variables](https://en.wikipedia.org/wiki/Envir
 ```bash
 env-aws-params --prefix /path/to/kv/pairs --command /bin/bash -- -c set
 ```
+
+## Building
+This project uses [dep](http://github.com/golang/dep). To build the project:
+
+```bash
+dep ensure
+go build
+```
