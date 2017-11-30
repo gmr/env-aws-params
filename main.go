@@ -27,10 +27,6 @@ func main() {
 			Name:  "command, c",
 			Usage: "Command",
 		},
-		cli.StringSliceFlag{
-			Name:   "args",
-			Hidden: true,
-		},
 	}
 
 	app.Action = func(c *cli.Context) error {

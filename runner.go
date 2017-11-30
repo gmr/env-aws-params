@@ -9,8 +9,9 @@ import (
 )
 
 func RunCommand(command string, args []string, envvars []string) {
-	log.WithFields(log.Fields{"command": command,
-		"args": args},
+	log.WithFields(log.Fields{
+		"command": command,
+		"args":    args},
 	).Info("Running command")
 	cmd := exec.Command(command, args...)
 	cmd.Env = append(os.Environ(), envvars...)
