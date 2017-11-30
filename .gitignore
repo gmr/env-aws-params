@@ -1,4 +1,4 @@
 env-aws-params
 vendor
 .idea
-test.sh
+coverage.txt

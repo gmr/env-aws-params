@@ -1,4 +1,7 @@
 # env-aws-params
+
+[![Build Status](https://travis-ci.org/gmr/env-aws-params.svg?branch=master)](https://travis-ci.org/gmr/env-aws-params)
+
 ``env-aws-params`` is a tool that injects AWS EC2 Systems Manager (SSM) [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html) 
 Key / Value pairs as [Environment Variables](https://en.wikipedia.org/wiki/Environment_variable) when executing an
 application. It is intended to be used as a Docker [Entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint),
