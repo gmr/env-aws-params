@@ -20,13 +20,13 @@ aws ssm put-parameter --name /service-prefix/ENV_VAR2 --value test-value
 
 Then use ``env-aws-params`` to have bash display the env vars it was called with:
 ```bash
-env-aws-params --prefix /service-prefix --command /bin/bash -c set
+env-aws-params --prefix /service-prefix /bin/bash -c set
 ```
 
 If you want to include common and service specific values, ``--prefix`` can be specified
 multiple times:
 ```bash
-env-aws-params --prefix /common --command /bin/bash -c set
+env-aws-params --prefix /common /bin/bash -c set
 ```
 
 ## CLI Options
