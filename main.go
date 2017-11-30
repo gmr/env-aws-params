@@ -14,9 +14,6 @@ func init() {
 }
 
 func main() {
-	var command string
-	var prefix string
-
 	app := cli.NewApp()
 	app.Name = "env-aws-params"
 	app.Usage = "Application entry-point that injects SSM Parameter Store values as Environment Variables"
@@ -24,15 +21,15 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "prefix, p",
-			Value:       "",
 			Usage:       "Key prefix that is used to retrieve the environment variables ",
-			Destination: &prefix,
 		},
 		cli.StringFlag{
 			Name:        "command, c",
-			Value:       "",
 			Usage:       "Command",
-			Destination: &command,
+		},
+		cli.StringSliceFlag{
+			Name:        "args",
+			Hidden:      true,
 		},
 	}
 
@@ -45,7 +42,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		parameters, err := ssm.GetParametersByPath(prefix)
+		parameters, err := ssm.GetParametersByPath(c.GlobalString("prefix"))
 		if err != nil {
 			log.Error(err)
 			os.Exit(2)
@@ -55,7 +52,7 @@ func main() {
 			vars = append(vars, fmt.Sprintf("%s=%s", k, v))
 		}
 
-		RunCommand(command, vars)
+		RunCommand(c.GlobalString("command"), c.Args(), vars)
 		return nil
 	}
 
