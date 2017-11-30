@@ -14,15 +14,17 @@ type SSMClient struct {
 	client *ssm.SSM
 }
 
-func NewSSMClient() (*SSMClient, error) {
+func NewSSMClient(region string) (*SSMClient, error) {
 	var config *aws.Config
 
-	sess := session.Must(session.NewSession())
+	sess := session.Must(session.NewSession(
+		&aws.Config{Region: aws.String(region)}))
 	_, err := sess.Config.Credentials.Get()
 	if err != nil {
 		return nil, err
 	}
 	config = nil
+
 	endpoint := os.Getenv("SSM_ENDPOINT")
 	if endpoint != "" {
 		config = &aws.Config{
