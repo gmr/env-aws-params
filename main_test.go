@@ -6,15 +6,15 @@ import (
 	"testing"
 )
 
-func AssertEqual(t *testing.T, v1 []string, v2 []string) {
-	if len(v1) != len(v2) {
-		t.Error("Slices are not the same length", len(v1), len(v2))
+func AssertEqual(t *testing.T, value []string, expect []string) {
+	if len(value) != len(expect) {
+		t.Error("Slices are not the same length", len(value), len(expect))
 	}
-	v1 = sort.StringSlice(v1)
-	v2 = sort.StringSlice(v2)
-	for i, _ := range v1 {
-		if v1[i] != v2[i] {
-			t.Error(fmt.Sprintf("Values at offset %v do not match", i), v1[i], v2[i])
+	sort.Strings(value)
+	sort.Strings(expect)
+	for i, _ := range value {
+		if value[i] != expect[i] {
+			t.Error(fmt.Sprintf("Values at offset %v do not match", i), value[i], expect[i])
 		}
 	}
 }
@@ -26,7 +26,7 @@ func TestBuildEnvVarsUpcaseFalse(t *testing.T) {
 	params["FOO"] = "bar"
 	params["baz"] = "qux"
 
-	expectation := []string{"FOO=bar", "baz=qux"}
+	expectation := []string{"baz=qux", "FOO=bar"}
 	envvars := BuildEnvVars(params, false)
 	AssertEqual(t, envvars, expectation)
 }
@@ -38,7 +38,7 @@ func TestBuildEnvVarsUpcaseTrue(t *testing.T) {
 	params["FOO"] = "bar"
 	params["baz"] = "qux"
 
-	expectation := []string{"FOO=bar", "BAZ=qux"}
+	expectation := []string{"BAZ=qux", "FOO=bar"}
 	envvars := BuildEnvVars(params, true)
 	AssertEqual(t, envvars, expectation)
 }
