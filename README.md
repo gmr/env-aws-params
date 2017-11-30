@@ -9,9 +9,15 @@ The primary goal is to provide a way of injecting environment variables for
 in the SSM Parameter store. It was directly inspired by [envconsul](https://github.com/hashicorp/envconsul).
 
 ## Example Usage
-
+Create parameters in Parameter Store:
 ```bash
-env-aws-params --prefix /path/to/kv/pairs --command /bin/bash -- -c set
+aws ssm put-parameter --name /service-prefix/ENV_VAR1 --value example
+aws ssm put-parameter --name /service-prefix/ENV_VAR2 --value test-value
+```
+
+Then use ``env-aws-params`` to have bash display the env vars it was called with:
+```bash
+env-aws-params --prefix /service-prefix --command /bin/bash -- -c set
 ```
 
 ## Building
