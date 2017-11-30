@@ -20,16 +20,16 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:        "prefix, p",
-			Usage:       "Key prefix that is used to retrieve the environment variables ",
+			Name:  "prefix, p",
+			Usage: "Key prefix that is used to retrieve the environment variables ",
 		},
 		cli.StringFlag{
-			Name:        "command, c",
-			Usage:       "Command",
+			Name:  "command, c",
+			Usage: "Command",
 		},
 		cli.StringSliceFlag{
-			Name:        "args",
-			Hidden:      true,
+			Name:   "args",
+			Hidden: true,
 		},
 	}
 
