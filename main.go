@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"os"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
+	"strings"
 )
 
 func init() {
@@ -19,7 +19,15 @@ func main() {
 	app.Name = "env-aws-params"
 	app.Usage = "Application entry-point that injects SSM Parameter Store values as Environment Variables"
 	app.UsageText = "env-aws-params [global options] -p prefix command [command arguments]"
-	app.Flags = []cli.Flag{
+	app.Flags = cliFlags()
+	app.Action = func(c *cli.Context) error {
+		return action(c)
+	}
+	app.Run(os.Args)
+}
+
+func cliFlags() []cli.Flag {
+	return []cli.Flag{
 		cli.StringFlag{
 			Name:   "aws-region",
 			Usage:  "The AWS region to use for the Parameter Store API",
@@ -38,56 +46,78 @@ func main() {
 			Usage: "Replace invalid characters in keys to underscores",
 		},
 		cli.BoolFlag{
+			Name:  "strip",
+			Usage: "Strip invalid characters in keys",
+		},
+		cli.BoolFlag{
 			Name:  "upcase",
 			Usage: "Force keys to uppercase",
 		},
 	}
-
-	app.Action = func(c *cli.Context) error {
-		var envvars []string
-
-		if len(c.GlobalStringSlice("prefix")) == 0 {
-			log.Fatal("prefix is required")
-			os.Exit(1)
-		}
-
-		fmt.Print(c.GlobalString("aws-region"))
-
-		client, err := NewSSMClient(c.GlobalString("aws-region"))
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(2)
-		}
-
-		for _, path := range c.GlobalStringSlice("prefix") {
-			params, err := client.GetParametersByPath(path)
-			if err != nil {
-				log.Error(err)
-				os.Exit(3)
-			}
-			vars := BuildEnvVars(params, c.GlobalBool("upcase"))
-			envvars = append(envvars, vars...)
-		}
-
-		if c.GlobalBool("pristine") == false {
-			envvars = append(os.Environ(), envvars...)
-		}
-
-		RunCommand(c.Args()[0], c.Args()[1:], envvars)
-		return nil
-	}
-
-	app.Run(os.Args)
 }
 
-func BuildEnvVars(parameters map[string]string, upcase bool) []string {
-	var vars []string
-
-	for k, v := range parameters {
-		if upcase == true {
-			k = strings.ToUpper(k)
-		}
-		vars = append(vars, fmt.Sprintf("%s=%s", k, v))
+func action(c *cli.Context) error {
+	code, err := validateArgs(c)
+	if code > 0 {
+		return cli.NewExitError(errorPrefix(err), code)
 	}
-	return vars
+
+	params, err := getParameters(c)
+	if err != nil {
+		return cli.NewExitError(errorPrefix(err), code)
+	}
+
+	envVars := BuildEnvVars(
+		params,
+		c.GlobalBool("sanitize"),
+		c.GlobalBool("strip"),
+		c.GlobalBool("upcase"))
+
+	if c.GlobalBool("pristine") == false {
+		envVars = append(os.Environ(), envVars...)
+	}
+
+	RunCommand(c.Args()[0], c.Args()[1:], envVars)
+
+	return nil
+}
+
+func errorPrefix(err error) string {
+	return strings.Join([]string{"ERROR:", err.Error()}, " ")
+}
+
+func getParameters(c *cli.Context) (map[string]string, error) {
+	values := make(map[string]string)
+
+	client, err := NewSSMClient(c.GlobalString("aws-region"))
+	if err != nil {
+		return values, err
+	}
+
+	for _, path := range c.GlobalStringSlice("prefix") {
+		params, err := client.GetParametersByPath(path)
+		if err != nil {
+			return values, err
+		}
+		for k, v := range params {
+			values[k] = v
+		}
+	}
+	return values, nil
+}
+
+func validateArgs(c *cli.Context) (int, error) {
+	if len(c.GlobalStringSlice("prefix")) == 0 {
+		return 1, errors.New("prefix is required")
+	}
+
+	if c.NArg() == 0 {
+		return 2, errors.New("command not specified")
+	}
+
+	if c.GlobalBool("sanitize") == c.GlobalBool("strip") == true {
+		return 3, errors.New("--sanitize and --strip are mutually exclusive behaviors")
+	}
+
+	return 0, nil
 }

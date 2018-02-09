@@ -1,44 +1,87 @@
 package main
 
 import (
-	"fmt"
-	"sort"
+	"errors"
+	"flag"
+	"io/ioutil"
 	"testing"
+
+	"github.com/urfave/cli"
 )
 
-func AssertEqual(t *testing.T, value []string, expect []string) {
-	if len(value) != len(expect) {
-		t.Error("Slices are not the same length", len(value), len(expect))
+func NewContext(t *testing.T, testArgs []string) *cli.Context {
+	app := cli.NewApp()
+	app.Writer = ioutil.Discard
+	app.Flags = cliFlags()
+	set := flag.NewFlagSet("test", 0)
+	for _, f := range app.Flags {
+		f.Apply(set)
 	}
-	sort.Strings(value)
-	sort.Strings(expect)
-	for i, _ := range value {
-		if value[i] != expect[i] {
-			t.Error(fmt.Sprintf("Values at offset %v do not match", i), value[i], expect[i])
-		}
+	set.Parse(testArgs)
+	return cli.NewContext(app, set, nil)
+}
+
+func TestMissingPrefix(t *testing.T) {
+	var testArgs []string
+
+	testArgs = []string{"--upcase"}
+
+	code, err := validateArgs(NewContext(t, testArgs))
+	if code != 1 {
+		t.Fatalf("expected code to be 1, got %v", code)
+	}
+	if err == nil {
+		t.Fatalf("expected err to be set, got nil")
 	}
 }
 
-func TestBuildEnvVarsUpcaseFalse(t *testing.T) {
-	var params map[string]string
+func TestMissingCommand(t *testing.T) {
+	var testArgs []string
 
-	params = make(map[string]string)
-	params["FOO"] = "bar"
-	params["baz"] = "qux"
+	testArgs = []string{"--prefix", "/foo"}
 
-	expectation := []string{"baz=qux", "FOO=bar"}
-	envvars := BuildEnvVars(params, false)
-	AssertEqual(t, envvars, expectation)
+	code, err := validateArgs(NewContext(t, testArgs))
+	if code != 2 {
+		t.Fatalf("expected code to be 2, got %v", code)
+	}
+	if err == nil {
+		t.Fatalf("expected err to be set, got nil")
+	}
 }
 
-func TestBuildEnvVarsUpcaseTrue(t *testing.T) {
-	var params map[string]string
+func TestMissingStripAndSanitize(t *testing.T) {
+	var testArgs []string
 
-	params = make(map[string]string)
-	params["FOO"] = "bar"
-	params["baz"] = "qux"
+	testArgs = []string{"--prefix", "/foo", "--strip", "--sanitize", "/bin/bash"}
 
-	expectation := []string{"BAZ=qux", "FOO=bar"}
-	envvars := BuildEnvVars(params, true)
-	AssertEqual(t, envvars, expectation)
+	code, err := validateArgs(NewContext(t, testArgs))
+	if code != 3 {
+		t.Fatalf("expected code to be 3, got %v", code)
+	}
+	if err == nil {
+		t.Fatalf("expected err to be set, got nil")
+	}
+}
+
+func TestValidCLIOptions(t *testing.T) {
+	var testArgs []string
+
+	testArgs = []string{"--prefix", "/foo", "--strip", "/bin/bash"}
+
+	code, err := validateArgs(NewContext(t, testArgs))
+	if code != 0 {
+		t.Fatalf("expected code to be 0, got %v", code)
+	}
+	if err != nil {
+		t.Fatalf("expected err to be nil, got %v", code)
+	}
+}
+
+func TestErrorPrefix(t *testing.T) {
+	testError := errors.New("foo bar")
+	result := errorPrefix(testError)
+	expectation := "ERROR: foo bar"
+	if result != expectation {
+		t.Fatalf("expected \"%v\", got \"%v\"", result, expectation)
+	}
 }
