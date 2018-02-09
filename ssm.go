@@ -17,9 +17,9 @@ type SSMClient struct {
 func NewSSMClient(region string) (*SSMClient, error) {
 	var config *aws.Config
 
-	sess := session.Must(session.NewSession(
+	awsSession := session.Must(session.NewSession(
 		&aws.Config{Region: aws.String(region)}))
-	_, err := sess.Config.Credentials.Get()
+	_, err := awsSession.Config.Credentials.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,8 @@ func NewSSMClient(region string) (*SSMClient, error) {
 			Endpoint: &endpoint,
 		}
 	}
-	client := ssm.New(sess, config)
+
+	client := ssm.New(awsSession, config)
 	return &SSMClient{client}, nil
 }
 
