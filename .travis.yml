@@ -5,7 +5,7 @@ after_success:
 - bash <(curl -s https://codecov.io/bash)
 before_deploy:
 - rm -f env-aws-params
-- GOOS=linux GOARCH=amd64 go build -ldflags="-w -s -X main.VersionString=v${TRAVIS_TAG}"
+- GOOS=linux GOARCH=amd64 go build -ldflags="-w -s -X main.VersionString=v${TRAVIS_TAG} -a -installsuffix cgo"
 - zip env-aws-params_${TRAVIS_TAG}_linux_amd64.zip env-aws-params
 deploy:
   provider: releases
