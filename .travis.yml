@@ -9,7 +9,7 @@ after_success:
 - bash <(curl -s https://codecov.io/bash)
 jobs:
   include:
-  - go: 1.1
+  - go: 1.10
   - stage: deploy
     script: go build -x -ldflags "-X main.VersionString v${TRAVIS_TAG}"
     after_success: zip env-aws-params_${TRAVIS_TAG}_linux_amd64.zip env-aws-params
