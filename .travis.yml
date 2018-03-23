@@ -6,6 +6,7 @@ script: go test -race -coverprofile=coverage.txt -covermode=atomic
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 before_deploy:
+- rm -f env-aws-params
 - go build -ldflags="-w -s -X main.VersionString=v${TRAVIS_TAG}"
 - zip env-aws-params_${TRAVIS_TAG}_${GOOS}_${GOARCH}.zip env-aws-params
 deploy:
