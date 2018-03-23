@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var VersionString string
+
 func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.InfoLevel)
@@ -19,6 +21,7 @@ func main() {
 	app.Name = "env-aws-params"
 	app.Usage = "Application entry-point that injects SSM Parameter Store values as Environment Variables"
 	app.UsageText = "env-aws-params [global options] -p prefix command [command arguments]"
+	app.Version = VersionString
 	app.Flags = cliFlags()
 	app.Action = func(c *cli.Context) error {
 		return action(c)
