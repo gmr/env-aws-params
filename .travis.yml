@@ -1,10 +1,26 @@
 language: go
-
-go:
-  - 1.9
-
-script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic
-
+skip_cleanup: true
+stages:
+- test
+- name: coverage
+  if: repo IS gmr/env-aws-params
+- name: deploy
+  if: repo IS gmr/env-aws-params AND tag IS present
+script: go test -race -coverprofile=coverage.txt -covermode=atomic
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
+jobs:
+  include:
+  - go: 1.1
+  - stage: deploy
+    script: go build -x -ldflags "-X main.VersionString v${TRAVIS_TAG}"
+    after_success: zip env-aws-params_${TRAVIS_TAG}_linux_amd64.zip env-aws-params
+    deploy:
+      provider: releases
+      api_key:
+        secure: OTrokvVlY1BE0o0qO+6EYcuBk5gY9jVg7zavN0+uYbeL6lztv8YPNOlevAltdiKW+37VzTvdXuY4B0ht6HkxttCaKXe6BDYoA117HpcSoqKqVHi7HvLgB7tEumQ1g2NulCd7tger04uskk3jcCns4wRsg8TYy/QhtiegIxjQz4tEmPMeIZclV3clJZB6EbDNXac3MWVQpZutNahUhGAb/YczKGJY/ElwBMhzzbE6Jbhultj/dr80VtAJNKFp/PTYCFovIfIlGDQTDHb2b7c9SpfDfOiLcW/97JwpwcAYVuyG3/YhozqaVrDvGDHtdTuDuSzbMe9aB0KruVEb7fwXSRnodaQzeFXUqLQ0RZqhY0SQ+h0FVs7YlTKiveM9B2ejoPL+Lb34XnaMcUfwHdB+bafqXYqYkbWGCv7GO2wvxVcsMapvL4b9LLLonoi7zJClBIHS0aDYeHmDIw4DnIJAOSvDgcDZgHgKyGaeGs4Y19sHZ/C6nTihWpkAeWMRrL05eYuBBNUvgufUPurEnLUpbcbCNK/xXknsIr1yDXYxy6znTY/Q4dN7rY39LRMth2GFiZuvSpKGHcTkZIwUG9XJj+Cifr8zp19HPCuWz5r3HsqSkA4Y0GaIhTQsow3DIJ+jZGdhjVnMQzFiYyV5ya98ea/84HzEt+Ovbe1O7TBbrnU=
+      file: env-aws-params_${TRAVIS_TAG}_linux_amd64.zip
+      skip_cleanup: true
+      on:
+      repo: gmr/env-aws-params
+        tags: true
