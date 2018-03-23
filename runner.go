@@ -1,23 +1,56 @@
 package main
 
 import (
-	"fmt"
-	"os/exec"
+	"os"
+	"os/signal"
+	"syscall"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func RunCommand(command string, args []string, envVars []string) {
+func RunCommand(command string, args []string, envVars []string) error {
 	log.WithFields(log.Fields{
 		"command": command,
-		"args":    args},
+		"args":    args,
+		"pid": os.Getpid()},
 	).Info("Running command")
-	cmd := exec.Command(command, args...)
-	cmd.Env = envVars
-	out, err := cmd.Output()
+
+	procAttr := new(os.ProcAttr)
+	procAttr.Env = envVars
+	procAttr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
+
+	proc, err := os.StartProcess(command, args, procAttr)
 	if err != nil {
-		log.Error(err)
-	} else {
-		fmt.Printf("%s\n", out)
+		return err
 	}
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
+	go func() {
+		sigv := <-sigc
+		switch sigv {
+		case syscall.SIGHUP:
+			err = syscall.Kill(-os.Getpid(), syscall.SIGHUP)
+		case syscall.SIGINT:
+			err = syscall.Kill(-os.Getpid(), syscall.SIGINT)
+		case syscall.SIGTERM:
+			err = syscall.Kill(-os.Getpid(), syscall.SIGTERM)
+		case syscall.SIGQUIT:
+			err = syscall.Kill(-os.Getpid(), syscall.SIGQUIT)
+		default:
+			err = syscall.Kill(-os.Getpid(), syscall.SIGTERM)
+		}
+		log.WithFields(log.Fields{
+			"err": err,
+			"proc": proc,
+			"pid": -proc.Pid,
+			"signal": sigv},
+		).Info("Caught signal, sent to child")
+	}()
+	_, err = proc.Wait()
+	log.Info("Exiting")
+	return err
 }
