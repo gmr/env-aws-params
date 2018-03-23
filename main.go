@@ -26,36 +26,6 @@ func main() {
 	app.Run(os.Args)
 }
 
-func cliFlags() []cli.Flag {
-	return []cli.Flag{
-		cli.StringFlag{
-			Name:   "aws-region",
-			Usage:  "The AWS region to use for the Parameter Store API",
-			EnvVar: "AWS_REGION",
-		},
-		cli.StringSliceFlag{
-			Name:  "prefix, p",
-			Usage: "Key prefix that is used to retrieve the environment variables - supports multiple use",
-		},
-		cli.BoolFlag{
-			Name:  "pristine",
-			Usage: "Only use values retrieved from Parameter Store, do not inherit the existing environment variables",
-		},
-		cli.BoolFlag{
-			Name:  "sanitize",
-			Usage: "Replace invalid characters in keys to underscores",
-		},
-		cli.BoolFlag{
-			Name:  "strip",
-			Usage: "Strip invalid characters in keys",
-		},
-		cli.BoolFlag{
-			Name:  "upcase",
-			Usage: "Force keys to uppercase",
-		},
-	}
-}
-
 func action(c *cli.Context) error {
 	code, err := validateArgs(c)
 	if code > 0 {
@@ -77,9 +47,47 @@ func action(c *cli.Context) error {
 		envVars = append(os.Environ(), envVars...)
 	}
 
-	RunCommand(c.Args()[0], c.Args()[1:], envVars)
+	err = RunCommand(c.Args()[0], c.Args()[1:], envVars)
+	if err != nil {
+		return cli.NewExitError(errorPrefix(err), 128)
+	}
 
 	return nil
+}
+
+func cliFlags() []cli.Flag {
+	return []cli.Flag{
+		cli.StringFlag{
+			Name:   "aws-region",
+			Usage:  "The AWS region to use for the Parameter Store API",
+			EnvVar: "AWS_REGION",
+		},
+		cli.StringSliceFlag{
+			Name:  "prefix, p",
+			Usage: "Key prefix that is used to retrieve the environment variables - supports multiple use",
+			EnvVar: "PARAMS_PREFIX",
+		},
+		cli.BoolFlag{
+			Name:  "pristine",
+			Usage: "Only use values retrieved from Parameter Store, do not inherit the existing environment variables",
+			EnvVar: "PARAMS_PRISTINE",
+		},
+		cli.BoolFlag{
+			Name:  "sanitize",
+			Usage: "Replace invalid characters in keys to underscores",
+			EnvVar: "PARAMS_SANITIZE",
+		},
+		cli.BoolFlag{
+			Name:  "strip",
+			Usage: "Strip invalid characters in keys",
+			EnvVar: "PARAMS_STRIP",
+		},
+		cli.BoolFlag{
+			Name:  "upcase",
+			Usage: "Force keys to uppercase",
+			EnvVar: "PARAMS_UPCASE",
+		},
+	}
 }
 
 func errorPrefix(err error) string {
@@ -115,7 +123,7 @@ func validateArgs(c *cli.Context) (int, error) {
 		return 2, errors.New("command not specified")
 	}
 
-	if c.GlobalBool("sanitize") == c.GlobalBool("strip") == true {
+	if c.GlobalBool("sanitize") == true && c.GlobalBool("strip") == true {
 		return 3, errors.New("--sanitize and --strip are mutually exclusive behaviors")
 	}
 
