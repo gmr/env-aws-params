@@ -2,8 +2,6 @@ language: go
 skip_cleanup: true
 stages:
 - test
-- name: coverage
-  if: repo IS gmr/env-aws-params
 - name: deploy
   if: repo IS gmr/env-aws-params AND tag IS present
 script: go test -race -coverprofile=coverage.txt -covermode=atomic
