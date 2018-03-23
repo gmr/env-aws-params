@@ -12,7 +12,7 @@ jobs:
   include:
   - stage: test
   - stage: deploy
-    script: go build -x -ldflags "-X main.VersionString=v${TRAVIS_TAG}"
+    script: go build -race -ldflags="-w -s -X main.VersionString=v${TRAVIS_TAG}" -a -installsuffix cgo
     after_success: zip env-aws-params_${TRAVIS_TAG}_linux_amd64.zip env-aws-params
     deploy:
       provider: releases
