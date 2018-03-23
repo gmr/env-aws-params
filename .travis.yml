@@ -2,8 +2,7 @@ language: go
 skip_cleanup: true
 go: "1.10"
 env:
-  - GOOS=linux
-  - GOARCH=amd64
+- GOOS=linux GOARCH=amd64
 stages:
 - test
 - name: deploy
