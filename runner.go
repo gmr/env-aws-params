@@ -3,17 +3,16 @@ package main
 import (
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func RunCommand(command string, args []string, envVars []string) error {
-	log.WithFields(log.Fields{
-		"command": command,
-		"args":    args,
-		"pid": os.Getpid()},
-	).Info("Running command")
+
+	log.Infof("PID %v running %s %s", os.Getpid(), command,
+		strings.Join(args[:], " "))
 
 	procAttr := new(os.ProcAttr)
 	procAttr.Env = envVars
@@ -44,13 +43,13 @@ func RunCommand(command string, args []string, envVars []string) error {
 			err = syscall.Kill(-os.Getpid(), syscall.SIGTERM)
 		}
 		log.WithFields(log.Fields{
-			"err": err,
-			"proc": proc,
-			"pid": -proc.Pid,
+			"err":    err,
+			"proc":   proc,
+			"pid":    -proc.Pid,
 			"signal": sigv},
 		).Info("Caught signal, sent to child")
 	}()
 	_, err = proc.Wait()
-	log.Info("Exiting")
+	log.Debug("Exiting")
 	return err
 }
