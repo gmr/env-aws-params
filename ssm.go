@@ -5,9 +5,11 @@ import (
 	"os"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
 type SSMClient struct {
@@ -40,15 +42,34 @@ func (c *SSMClient) GetParametersByPath(path string) (map[string]string, error) 
 	if strings.HasSuffix(path, "/") != true {
 		path = fmt.Sprintf("%s/", path)
 	}
+
+	var nextToken *string
 	parameters := make(map[string]string)
-	params := &ssm.GetParametersByPathInput{
-		Path:           aws.String(path),
-		Recursive:      aws.Bool(true),
-		WithDecryption: aws.Bool(true),
+
+	for {
+		params := &ssm.GetParametersByPathInput{
+			Path:           aws.String(path),
+			Recursive:      aws.Bool(true),
+			WithDecryption: aws.Bool(true),
+			MaxResults:     aws.Int64(10),
+			NextToken:      nextToken,
+		}
+		response, err := c.client.GetParametersByPath(params)
+
+		if err != nil {
+			awsErr, _ := err.(awserr.Error)
+			log.Errorf("Error Getting Parameters from SSM: %s", awsErr.Code())
+			return nil, err
+		}
+
+		for _, p := range response.Parameters {
+			parameters[strings.TrimPrefix(*p.Name, path)] = *p.Value
+		}
+
+		if response.NextToken == nil {
+			break
+		}
+		nextToken = response.NextToken
 	}
-	response, err := c.client.GetParametersByPath(params)
-	for _, p := range response.Parameters {
-		parameters[strings.TrimPrefix(*p.Name, path)] = *p.Value
-	}
-	return parameters, err
+	return parameters, nil
 }
