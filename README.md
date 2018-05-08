@@ -41,9 +41,6 @@ NAME:
 USAGE:
    env-aws-params [global options] -p prefix command [command arguments]
 
-VERSION:
-   0.0.0
-
 COMMANDS:
      help, h  Shows a list of commands or help for one command
 
@@ -54,6 +51,7 @@ GLOBAL OPTIONS:
    --sanitize                Replace invalid characters in keys to underscores
    --strip                   Strip invalid characters in keys
    --upcase                  Force keys to uppercase
+   --debug                   Log additional debugging information [$PARAMS_DEBUG]
    --help, -h                show help
    --version, -v             print the version
 ```
