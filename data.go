@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -23,5 +24,6 @@ func BuildEnvVars(parameters map[string]string, sanitize bool, strip bool, upcas
 		}
 		vars = append(vars, fmt.Sprintf("%s=%s", k, v))
 	}
+	sort.Strings(vars)
 	return vars
 }
