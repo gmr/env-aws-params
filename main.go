@@ -30,6 +30,11 @@ func main() {
 }
 
 func action(c *cli.Context) error {
+
+	if c.GlobalBool("debug") {
+		log.SetLevel(log.DebugLevel)
+	}
+
 	code, err := validateArgs(c)
 	if code > 0 {
 		return cli.NewExitError(errorPrefix(err), code)
@@ -45,6 +50,10 @@ func action(c *cli.Context) error {
 		c.GlobalBool("sanitize"),
 		c.GlobalBool("strip"),
 		c.GlobalBool("upcase"))
+
+	for _, v := range envVars {
+		log.Debugf("Setting %s", v)
+	}
 
 	if c.GlobalBool("pristine") == false {
 		envVars = append(os.Environ(), envVars...)
@@ -66,29 +75,34 @@ func cliFlags() []cli.Flag {
 			EnvVar: "AWS_REGION",
 		},
 		cli.StringSliceFlag{
-			Name:  "prefix, p",
-			Usage: "Key prefix that is used to retrieve the environment variables - supports multiple use",
+			Name:   "prefix, p",
+			Usage:  "Key prefix that is used to retrieve the environment variables - supports multiple use",
 			EnvVar: "PARAMS_PREFIX",
 		},
 		cli.BoolFlag{
-			Name:  "pristine",
-			Usage: "Only use values retrieved from Parameter Store, do not inherit the existing environment variables",
+			Name:   "pristine",
+			Usage:  "Only use values retrieved from Parameter Store, do not inherit the existing environment variables",
 			EnvVar: "PARAMS_PRISTINE",
 		},
 		cli.BoolFlag{
-			Name:  "sanitize",
-			Usage: "Replace invalid characters in keys to underscores",
+			Name:   "sanitize",
+			Usage:  "Replace invalid characters in keys to underscores",
 			EnvVar: "PARAMS_SANITIZE",
 		},
 		cli.BoolFlag{
-			Name:  "strip",
-			Usage: "Strip invalid characters in keys",
+			Name:   "strip",
+			Usage:  "Strip invalid characters in keys",
 			EnvVar: "PARAMS_STRIP",
 		},
 		cli.BoolFlag{
-			Name:  "upcase",
-			Usage: "Force keys to uppercase",
+			Name:   "upcase",
+			Usage:  "Force keys to uppercase",
 			EnvVar: "PARAMS_UPCASE",
+		},
+		cli.BoolFlag{
+			Name:   "debug",
+			Usage:  "Log additional debugging information",
+			EnvVar: "PARAMS_DEBUG",
 		},
 	}
 }
