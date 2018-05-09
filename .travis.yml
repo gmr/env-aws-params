@@ -6,6 +6,10 @@ services:
 
 go: "1.10"
 
+before_script:
+  - curl -s -L https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - dep ensure
+
 script: go test -race -coverprofile=coverage.txt -covermode=atomic
 
 after_success:
