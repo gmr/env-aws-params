@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/BurntSushi/toml"
+  packages = ["."]
+  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
+  version = "v0.3.0"
+
+[[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -13,6 +19,7 @@
     "aws/credentials",
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
+    "aws/credentials/plugincreds",
     "aws/credentials/stscreds",
     "aws/defaults",
     "aws/ec2metadata",
@@ -20,19 +27,176 @@
     "aws/request",
     "aws/session",
     "aws/signer/v4",
+    "awsmigrate/awsmigrate-renamer/rename",
+    "awstesting",
+    "awstesting/integration",
+    "awstesting/integration/smoke",
+    "awstesting/mock",
+    "awstesting/unit",
     "internal/shareddefaults",
+    "private/model/api",
     "private/protocol",
+    "private/protocol/ec2query",
     "private/protocol/json/jsonutil",
     "private/protocol/jsonrpc",
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
+    "private/protocol/restjson",
+    "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
+    "private/signer/v2",
+    "private/util",
+    "service/acm",
+    "service/alexaforbusiness",
+    "service/apigateway",
+    "service/applicationautoscaling",
+    "service/applicationdiscoveryservice",
+    "service/appstream",
+    "service/appsync",
+    "service/athena",
+    "service/autoscaling",
+    "service/autoscalingplans",
+    "service/batch",
+    "service/budgets",
+    "service/cloud9",
+    "service/clouddirectory",
+    "service/cloudformation",
+    "service/cloudfront",
+    "service/cloudfront/sign",
+    "service/cloudhsm",
+    "service/cloudhsmv2",
+    "service/cloudsearch",
+    "service/cloudsearchdomain",
+    "service/cloudtrail",
+    "service/cloudwatch",
+    "service/cloudwatchevents",
+    "service/cloudwatchlogs",
+    "service/codebuild",
+    "service/codecommit",
+    "service/codedeploy",
+    "service/codepipeline",
+    "service/codestar",
+    "service/cognitoidentity",
+    "service/cognitoidentityprovider",
+    "service/cognitosync",
+    "service/comprehend",
+    "service/configservice",
+    "service/costandusagereportservice",
+    "service/costexplorer",
+    "service/databasemigrationservice",
+    "service/datapipeline",
+    "service/dax",
+    "service/devicefarm",
+    "service/directconnect",
+    "service/directoryservice",
+    "service/dynamodb",
+    "service/dynamodb/dynamodbattribute",
+    "service/dynamodb/dynamodbiface",
+    "service/dynamodb/expression",
+    "service/dynamodbstreams",
+    "service/ec2",
+    "service/ecr",
+    "service/ecs",
+    "service/efs",
+    "service/elasticache",
+    "service/elasticbeanstalk",
+    "service/elasticsearchservice",
+    "service/elastictranscoder",
+    "service/elb",
+    "service/elbv2",
+    "service/emr",
+    "service/firehose",
+    "service/gamelift",
+    "service/glacier",
+    "service/glue",
+    "service/greengrass",
+    "service/guardduty",
+    "service/health",
+    "service/iam",
+    "service/inspector",
+    "service/iot",
+    "service/iotdataplane",
+    "service/iotjobsdataplane",
+    "service/kinesis",
+    "service/kinesisanalytics",
+    "service/kinesisvideo",
+    "service/kinesisvideoarchivedmedia",
+    "service/kinesisvideomedia",
+    "service/kms",
+    "service/kms/kmsiface",
+    "service/lambda",
+    "service/lexmodelbuildingservice",
+    "service/lexruntimeservice",
+    "service/lightsail",
+    "service/machinelearning",
+    "service/marketplacecommerceanalytics",
+    "service/marketplaceentitlementservice",
+    "service/marketplacemetering",
+    "service/mediaconvert",
+    "service/medialive",
+    "service/mediapackage",
+    "service/mediastore",
+    "service/mediastoredata",
+    "service/migrationhub",
+    "service/mobile",
+    "service/mobileanalytics",
+    "service/mq",
+    "service/mturk",
+    "service/opsworks",
+    "service/opsworkscm",
+    "service/organizations",
+    "service/pinpoint",
+    "service/polly",
+    "service/pricing",
+    "service/rds",
+    "service/rds/rdsutils",
+    "service/redshift",
+    "service/rekognition",
+    "service/resourcegroups",
+    "service/resourcegroupstaggingapi",
+    "service/route53",
+    "service/route53domains",
+    "service/s3",
+    "service/s3/s3crypto",
+    "service/s3/s3iface",
+    "service/s3/s3manager",
+    "service/sagemaker",
+    "service/sagemakerruntime",
+    "service/serverlessapplicationrepository",
+    "service/servicecatalog",
+    "service/servicediscovery",
+    "service/ses",
+    "service/sfn",
+    "service/shield",
+    "service/simpledb",
+    "service/sms",
+    "service/snowball",
+    "service/sns",
+    "service/sqs",
+    "service/sqs/sqsiface",
     "service/ssm",
-    "service/sts"
+    "service/storagegateway",
+    "service/sts",
+    "service/support",
+    "service/swf",
+    "service/transcribeservice",
+    "service/translate",
+    "service/waf",
+    "service/wafregional",
+    "service/workdocs",
+    "service/workmail",
+    "service/workspaces",
+    "service/xray"
   ]
   revision = "de28909e9837364f0368d94ddcba085c57af3c12"
   version = "v1.12.73"
+
+[[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/go-ini/ini"
@@ -41,15 +205,86 @@
   version = "v1.32.0"
 
 [[projects]]
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  revision = "a0583e0143b1624142adab07e0e97fe106d99561"
+  version = "v1.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gopherjs/gopherjs"
+  packages = ["js"]
+  revision = "8dffc02ea1cb8398bb73f30424697c60fcf8d4c5"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gucumber/gucumber"
+  packages = [
+    ".",
+    "gherkin"
+  ]
+  revision = "7d5c79e832a25825dbed83e78f8484d4ffe8ec16"
+
+[[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   revision = "0b12d6b5"
+
+[[projects]]
+  name = "github.com/jtolds/gls"
+  packages = ["."]
+  revision = "77f18212c9c7edc9bd6a33d383a7b545ce62f064"
+  version = "v4.2.1"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shiena/ansicolor"
+  packages = ["."]
+  revision = "a422bbe96644373c5753384a59d678f7d261ff10"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
   version = "v1.0.3"
+
+[[projects]]
+  name = "github.com/smartystreets/assertions"
+  packages = [
+    ".",
+    "internal/go-render/render",
+    "internal/oglematchers"
+  ]
+  revision = "7678a5452ebea5b7090a6b163f844c133f523da2"
+  version = "1.8.3"
+
+[[projects]]
+  name = "github.com/smartystreets/goconvey"
+  packages = [
+    "convey",
+    "convey/gotest",
+    "convey/reporting"
+  ]
+  revision = "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
+  version = "1.6.3"
+
+[[projects]]
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
+  version = "v1.2.1"
 
 [[projects]]
   name = "github.com/urfave/cli"
@@ -60,21 +295,110 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "acme",
+    "acme/autocert",
+    "curve25519",
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "nacl/auth",
+    "pkcs12/internal/rc2",
+    "ssh",
+    "ssh/terminal"
+  ]
   revision = "94eea52f7b742c7cbe0b03b22f0c4c8631ece122"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom",
+    "http/httpguts",
+    "http2",
+    "http2/hpack",
+    "idna"
+  ]
+  revision = "3a7846fea0afe8cc88deb31d8cfb1fa15a3615ef"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows"
+    "windows",
+    "windows/registry",
+    "windows/svc",
+    "windows/svc/debug",
+    "windows/svc/eventlog",
+    "windows/svc/mgr"
   ]
   revision = "316e9227019baa6ea3f76ea21538bab101fd1182"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/tools"
+  packages = [
+    "go/ast/astutil",
+    "go/buildutil",
+    "go/loader"
+  ]
+  revision = "48418e5732e1b1e2a10207c8007a5f959e422f20"
+
+[[projects]]
+  name = "gopkg.in/airbrake/gobrake.v2"
+  packages = ["."]
+  revision = "668876711219e8b0206e2994bf0a59d889c775aa"
+  version = "v2.0.9"
+
+[[projects]]
+  name = "gopkg.in/gemnasium/logrus-airbrake-hook.v2"
+  packages = ["."]
+  revision = "e928b033a891c0175fb643d5aa0779e86325eb12"
+  version = "v2.1.2"
+
+[[projects]]
+  name = "gopkg.in/ini.v1"
+  packages = ["."]
+  revision = "6529cf7c58879c08d927016dde4477f18a0634cb"
+  version = "v1.36.0"
+
+[[projects]]
+  name = "gopkg.in/urfave/cli.v1"
+  packages = ["."]
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
+
+[[projects]]
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bd52c08fa8e5fd81192c244d8ae266353eed0e261df285f74093291357e8579b"
+  inputs-digest = "22254367f313fc08f0eb908dd8fcf98408dbf43ee9131eedc11772940d669799"
   solver-name = "gps-cdcl"
   solver-version = 1
