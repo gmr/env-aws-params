@@ -1,10 +1,14 @@
 sudo: required
 language: go
+go: "1.10"
+gobuild_args: -x -ldflags "-X main.VersionString v${TRAVIS_TAG:-0.0.0} -a -installsuffix cgo"
+
+env:
+  - GOOS=linux
+  - GOARCH=amd64
 
 services:
   - docker
-
-go: "1.10"
 
 before_script:
   - curl -s -L https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -16,11 +20,12 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 before_deploy:
+  - dep ensure
   - rm -f env-aws-params
-  - GOOS=linux GOARCH=amd64 go build -ldflags="-w -s -X main.VersionString=v${TRAVIS_TAG} -a -installsuffix cgo"
+  - go build
   - zip env-aws-params_${TRAVIS_TAG}_linux_amd64.zip env-aws-params
-  - rm env-aws-params
-  - docker run --rm -t -e TRAVIS_TAG=${TRAVIS_TAG} gavinmroy/golang-build:1.10.1 make
+  - rm -f env-aws-params
+  - docker run --rm -t -e TRAVIS_TAG=${TRAVIS_TAG} -v `pwd`:/go/src/env-aws-params -w /go/src/env-aws-params gavinmroy/golang-build:1.10.1 make
   - zip env-aws-params_${TRAVIS_TAG}_alpine-linux_amd64.zip env-aws-params
 
 deploy:
