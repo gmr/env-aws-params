@@ -9,15 +9,15 @@ go: "1.10"
 script: go test -race -coverprofile=coverage.txt -covermode=atomic
 
 after_success:
-- bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
 
 before_deploy:
-- rm -f env-aws-params
-- GOOS=linux GOARCH=amd64 go build -ldflags="-w -s -X main.VersionString=v${TRAVIS_TAG} -a -installsuffix cgo"
-- zip env-aws-params_${TRAVIS_TAG}_linux_amd64.zip env-aws-params
-- rm env-aws-params
-- docker run --rm -t -e TRAVIS_TAG=${TRAVIS_TAG} gavinmroy/golang-build:1.10.1 make
-- zip env-aws-params_${TRAVIS_TAG}_alpine-linux_amd64.zip env-aws-params
+  - rm -f env-aws-params
+  - GOOS=linux GOARCH=amd64 go build -ldflags="-w -s -X main.VersionString=v${TRAVIS_TAG} -a -installsuffix cgo"
+  - zip env-aws-params_${TRAVIS_TAG}_linux_amd64.zip env-aws-params
+  - rm env-aws-params
+  - docker run --rm -t -e TRAVIS_TAG=${TRAVIS_TAG} gavinmroy/golang-build:1.10.1 make
+  - zip env-aws-params_${TRAVIS_TAG}_alpine-linux_amd64.zip env-aws-params
 
 deploy:
   provider: releases
