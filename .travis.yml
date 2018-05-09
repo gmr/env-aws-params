@@ -3,9 +3,7 @@ language: go
 go: "1.10"
 gobuild_args: -x -ldflags "-X main.VersionString v${TRAVIS_TAG:-0.0.0} -a -installsuffix cgo"
 
-env:
-  - GOOS=linux
-  - GOARCH=amd64
+env: GOOS=linux GOARCH=amd64
 
 services:
   - docker
