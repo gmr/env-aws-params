@@ -7,9 +7,5 @@
   version = "1.12.73"
 
 [[constraint]]
-  name = "github.com/go-ini/ini"
-  version = "1.32.0"
-
-[[constraint]]
   name = "github.com/sirupsen/logrus"
   version = "1.0.3"
