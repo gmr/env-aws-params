@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -12,7 +13,6 @@ import (
 var VersionString string
 
 func init() {
-	log.SetOutput(os.Stdout)
 	log.SetLevel(log.InfoLevel)
 }
 
@@ -33,6 +33,11 @@ func action(c *cli.Context) error {
 
 	if c.GlobalBool("debug") {
 		log.SetLevel(log.DebugLevel)
+	}
+	if c.GlobalBool("silent") {
+		log.SetOutput(ioutil.Discard)
+	} else {
+		log.SetOutput(os.Stdout)
 	}
 
 	code, err := validateArgs(c)
@@ -103,6 +108,11 @@ func cliFlags() []cli.Flag {
 			Name:   "debug",
 			Usage:  "Log additional debugging information",
 			EnvVar: "PARAMS_DEBUG",
+		},
+		cli.BoolFlag{
+			Name:   "silent",
+			Usage:  "Silence all logs",
+			EnvVar: "PARAMS_SILENT",
 		},
 	}
 }
