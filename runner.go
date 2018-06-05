@@ -18,6 +18,10 @@ func RunCommand(command string, args []string, envVars []string) error {
 	procAttr.Env = envVars
 	procAttr.Files = []*os.File{os.Stdin, os.Stdout, os.Stderr}
 
+	// prefix args with the command, as per https://golang.org/pkg/os/#StartProcess
+	// The argv slice will become os.Args in the new process, so it normally starts
+	// with the program name.
+	args = append([]string{command}, args...)
 	proc, err := os.StartProcess(command, args, procAttr)
 	if err != nil {
 		return err
