@@ -15,6 +15,7 @@ in the SSM Parameter store. It was directly inspired by
 [envconsul](https://github.com/hashicorp/envconsul).
 
 ## Example Usage
+
 Create parameters in Parameter Store:
 ```bash
 aws ssm put-parameter --name /service-prefix/ENV_VAR1 --value example
@@ -52,11 +53,13 @@ GLOBAL OPTIONS:
    --strip                   Strip invalid characters in keys
    --upcase                  Force keys to uppercase
    --debug                   Log additional debugging information [$PARAMS_DEBUG]
+   --silent                  Silence all logs [$PARAMS_SILENT]
    --help, -h                show help
    --version, -v             print the version
 ```
 
 ## Building
+
 This project uses [dep](http://github.com/golang/dep). To build the project:
 
 ```bash
