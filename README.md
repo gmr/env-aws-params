@@ -77,3 +77,5 @@ This project uses [dep](http://github.com/golang/dep). To build the project:
 dep ensure
 go build
 ```
+
+Building an environment is also provided as a docker image based on Alpine Linux. See the Dockerfile for more information.
