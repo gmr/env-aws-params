@@ -33,6 +33,17 @@ multiple times:
 env-aws-params --prefix /common /bin/bash -c set
 ```
 
+To get a plaintext output of your environment variables to use with other utilities, we can use `printenv`:
+```bash
+env-aws-params --silent --prefix /service-prefix /usr/bin/printenv > ~/some-file.sh
+```
+Which will write your environment variables in plain text, for example:
+```bash
+# ~/some-file.sh Contents:
+ENV_VAR1=example
+ENV_VAR2=test-value
+```
+
 ## CLI Options
 
 ```
