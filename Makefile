@@ -2,7 +2,7 @@ all: env-aws-params
 
 deps:
 	@ echo "Running dep ensure"
-	@ /go/bin/dep ensure
+	@ /usr/bin/env dep ensure
 
 env-aws-params: deps
 	@ echo "Running go build"
