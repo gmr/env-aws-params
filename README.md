@@ -35,7 +35,7 @@ env-aws-params --prefix /common /bin/bash -c set
 
 To get a plaintext output of your environment variables to use with other utilities, we can use `printenv`:
 ```bash
-env-aws-params --silent --prefix /service-prefix /usr/bin/printenv > ~/some-file.sh
+env-aws-params --pristine --silent --prefix /service-prefix /usr/bin/printenv > ~/some-file.sh
 ```
 Which will write your environment variables in plain text, for example:
 ```bash
@@ -79,3 +79,8 @@ go build
 ```
 
 Building an environment is also provided as a docker image based on Alpine Linux. See the Dockerfile for more information.
+
+```bash
+docker build -t env-aws-params; # Build the image
+docker run --rm -it -v $HOME/.aws/:/root/.aws/ env-aws-params [your options]
+```
