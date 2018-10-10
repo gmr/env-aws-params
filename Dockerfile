@@ -10,4 +10,3 @@ COPY --from=builder /go/src/github.com/gmr/env-aws-params/env-aws-params /
 RUN apk add --no-cache ca-certificates
 
 ENTRYPOINT [ "/env-aws-params" ]
-
