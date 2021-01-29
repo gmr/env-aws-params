@@ -2,3 +2,6 @@ env-aws-params
 vendor
 .idea
 coverage.txt
+target/*
+.vscode/*
+**.code-workspace
