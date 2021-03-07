@@ -1,0 +1,22 @@
+name: Build and push docker image
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build and Publish Tag Docker image
+        uses: VaultVulp/gp-docker-action@1.1.7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          image-name: ssm-env
+          extract-git-tag: true
