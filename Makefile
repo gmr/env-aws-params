@@ -26,7 +26,7 @@ deps:
 $(PLATFORMS): deps
 	GOOS=$(os) GOARCH=$(arch) $(GO) build -ldflags "-w -s -X main.VersionString=$(VERSION)" -o target/$(PKG_NAME)_$@
 
-$(TARGETS):
+$(TARGETS): go.mod
 	make $(platform)
 
 test: deps
