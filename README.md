@@ -71,10 +71,11 @@ GLOBAL OPTIONS:
 
 ## Building
 
-This project uses [dep](http://github.com/golang/dep). To build the project:
+This project uses [go modules](https://go.dev/blog/using-go-modules). To build the project:
 
 ```bash
-dep ensure
+go mod download
+go mod verify
 go build
 ```
 
