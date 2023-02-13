@@ -79,6 +79,11 @@ func cliFlags() []cli.Flag {
 			Usage:  "The AWS region to use for the Parameter Store API",
 			EnvVar: "AWS_REGION",
 		},
+		cli.StringFlag{
+			Name:   "profile",
+			Usage:  "Optional AWS profile to use for the Parameter Store API",
+			EnvVar: "AWS_PROFILE",
+		},
 		cli.StringSliceFlag{
 			Name:   "prefix, p",
 			Usage:  "Key prefix that is used to retrieve the environment variables - supports multiple use",
@@ -124,7 +129,7 @@ func errorPrefix(err error) string {
 func getParameters(c *cli.Context) (map[string]string, error) {
 	values := make(map[string]string)
 
-	client, err := NewSSMClient(c.GlobalString("aws-region"))
+	client, err := NewSSMClient(c.GlobalString("aws-region"), c.GlobalString("profile"))
 	if err != nil {
 		return values, err
 	}

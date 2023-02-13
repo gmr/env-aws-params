@@ -1,40 +1,42 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"os"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	log "github.com/sirupsen/logrus"
 )
 
 type SSMClient struct {
-	client *ssm.SSM
+	client *ssm.Client
 }
 
-func NewSSMClient(region string) (*SSMClient, error) {
-	var config *aws.Config
+func NewSSMClient(region string, profile string) (*SSMClient, error) {
 
-	awsSession := session.Must(session.NewSession(
-		&aws.Config{Region: aws.String(region)}))
-	_, err := awsSession.Config.Credentials.Get()
+	var cfg aws.Config
+	var err error
+
+	ctx := context.TODO()
+	if profile != "" {
+		cfg, err = config.LoadDefaultConfig(ctx,
+			config.WithSharedConfigProfile(profile),
+		)
+	} else {
+		cfg, err = config.LoadDefaultConfig(ctx)
+	}
 	if err != nil {
 		return nil, err
 	}
-	config = nil
 
-	endpoint := os.Getenv("SSM_ENDPOINT")
-	if endpoint != "" {
-		config = &aws.Config{
-			Endpoint: &endpoint,
-		}
+	if region != "" {
+		cfg.Region = region
 	}
 
-	client := ssm.New(awsSession, config)
+	client := ssm.NewFromConfig(cfg)
 	return &SSMClient{client}, nil
 }
 
@@ -51,14 +53,13 @@ func (c *SSMClient) GetParametersByPath(path string) (map[string]string, error) 
 			Path:           aws.String(path),
 			Recursive:      aws.Bool(true),
 			WithDecryption: aws.Bool(true),
-			MaxResults:     aws.Int64(10),
+			MaxResults:     aws.Int32(10),
 			NextToken:      nextToken,
 		}
-		response, err := c.client.GetParametersByPath(params)
+		response, err := c.client.GetParametersByPath(context.TODO(), params)
 
 		if err != nil {
-			awsErr, _ := err.(awserr.Error)
-			log.Errorf("Error Getting Parameters from SSM: %s", awsErr.Code())
+			log.Errorf("Error Getting Parameters from SSM: %s", err)
 			return nil, err
 		}
 
