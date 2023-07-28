@@ -50,7 +50,7 @@ func action(c *cli.Context) error {
 
 	params, err := getParameters(c)
 	if err != nil {
-		return cli.NewExitError(errorPrefix(err), code)
+		return cli.NewExitError(errorPrefix(err), -1)
 	}
 
 	envVars := BuildEnvVars(
