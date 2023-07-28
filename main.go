@@ -26,7 +26,10 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 		return action(c)
 	}
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func action(c *cli.Context) error {
@@ -66,6 +69,9 @@ func action(c *cli.Context) error {
 
 	err = RunCommand(c.Args()[0], c.Args()[1:], envVars)
 	if err != nil {
+		if cmdError, ok := err.(*CommandFailedError); ok {
+			return cli.NewExitError(errorPrefix(err), cmdError.ExitCode)
+		}
 		return cli.NewExitError(errorPrefix(err), 128)
 	}
 
