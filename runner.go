@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -8,6 +9,14 @@ import (
 
 	log "github.com/sirupsen/logrus"
 )
+
+type CommandFailedError struct {
+	ExitCode int
+}
+
+func (e *CommandFailedError) Error() string {
+	return fmt.Sprintf("Command failed with exit code %d", e.ExitCode)
+}
 
 func RunCommand(command string, args []string, envVars []string) error {
 
@@ -53,7 +62,12 @@ func RunCommand(command string, args []string, envVars []string) error {
 			"signal": sigv},
 		).Info("Caught signal, sent to child")
 	}()
-	_, err = proc.Wait()
-	log.Debug("Exiting")
-	return err
+	procState, err := proc.Wait()
+	if err != nil {
+		return err
+	}
+	if procState.ExitCode() != 0 {
+		return &CommandFailedError{procState.ExitCode()}
+	}
+	return nil
 }
