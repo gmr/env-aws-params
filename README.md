@@ -50,7 +50,7 @@ Available tags:
 - `main` — alias for `latest`
 - `<version>`, `<major>.<minor>`, `<major>` — tagged releases (e.g. `1.1.0`, `1.1`, `1`)
 
-The image's entrypoint is `env-aws-params`, so flags and the wrapped command go directly to `docker run`:
+The binary is installed at `/usr/local/bin/env-aws-params`, and the image's entrypoint is set to it, so flags and the wrapped command go directly to `docker run`:
 
 ```bash
 docker run --rm \
@@ -60,7 +60,25 @@ docker run --rm \
   --prefix /service-prefix /bin/sh -c env
 ```
 
-Or use it as a base image to wrap your own app:
+#### Copy the binary into your own image
+
+Because the binary is statically linked, you can copy it into any base image with a `COPY --from=` directive. This is the recommended pattern — your image keeps its own base, and `env-aws-params` just rides along as the entrypoint:
+
+```dockerfile
+FROM python:3.13-alpine
+
+COPY --from=ghcr.io/gmr/env-aws-params:latest \
+     /usr/local/bin/env-aws-params /usr/local/bin/env-aws-params
+
+COPY my-app /usr/local/bin/my-app
+
+ENTRYPOINT ["env-aws-params", "--prefix", "/my-service"]
+CMD ["my-app"]
+```
+
+#### Use it as a base image
+
+If you don't have a base image preference, you can also build `FROM` it directly (Alpine + `ca-certificates`):
 
 ```dockerfile
 FROM ghcr.io/gmr/env-aws-params:latest
