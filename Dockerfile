@@ -1,12 +1,23 @@
-FROM golang:1.11-alpine AS builder
-WORKDIR /go/src/github.com/gmr/env-aws-params
+ARG GO_VERSION=1.26
+
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS builder
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG VERSION=dev
+
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
-RUN apk add git make\
-    && go get -u github.com/golang/dep/cmd/dep \
-    && make all
 
-FROM alpine:3.8
-COPY --from=builder /go/src/github.com/gmr/env-aws-params/env-aws-params /
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go build -trimpath -ldflags "-w -s -X main.VersionString=${VERSION}" \
+    -o /out/env-aws-params .
+
+FROM alpine:latest
 RUN apk add --no-cache ca-certificates
-
-ENTRYPOINT [ "/env-aws-params" ]
+COPY --from=builder /out/env-aws-params /usr/local/bin/env-aws-params
+ENTRYPOINT ["/usr/local/bin/env-aws-params"]
