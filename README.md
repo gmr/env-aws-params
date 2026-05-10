@@ -96,8 +96,11 @@ aws ssm put-parameter --name /service-prefix/ENV_VAR2 --value test-value
 
 Then use ``env-aws-params`` to have bash display the env vars it was called with:
 ```bash
-env-aws-params --prefix /service-prefix /bin/bash -c set
+env-aws-params --prefix /service-prefix bash -c set
 ```
+
+The wrapped command is resolved against ``$PATH`` (so bare names like
+``bash`` work); pass an absolute or relative path to skip the lookup.
 
 If you want to include common and service specific values, ``--prefix`` can be specified
 multiple times:
@@ -125,20 +128,18 @@ NAME:
 USAGE:
    env-aws-params [global options] -p prefix command [command arguments]
 
-COMMANDS:
-     help, h  Shows a list of commands or help for one command
-
 GLOBAL OPTIONS:
-   --aws-region value        The AWS region to use for the Parameter Store API [$AWS_REGION]
-   --prefix value, -p value  Key prefix that is used to retrieve the environment variables - supports multiple use
-   --pristine                Only use values retrieved from Parameter Store, do not inherit the existing environment variables
-   --sanitize                Replace invalid characters in keys to underscores
-   --strip                   Strip invalid characters in keys
-   --upcase                  Force keys to uppercase
-   --debug                   Log additional debugging information [$PARAMS_DEBUG]
-   --silent                  Silence all logs [$PARAMS_SILENT]
-   --help, -h                show help
-   --version, -v             print the version
+   --aws-region string                                        The AWS region to use for the Parameter Store API [$AWS_REGION]
+   --profile string                                           Optional AWS profile to use for the Parameter Store API [$AWS_PROFILE]
+   --prefix string, -p string [ --prefix string, -p string ]  Key prefix that is used to retrieve the environment variables - supports multiple use [$PARAMS_PREFIX]
+   --pristine                                                 Only use values retrieved from Parameter Store, do not inherit the existing environment variables [$PARAMS_PRISTINE]
+   --sanitize                                                 Replace invalid characters in keys to underscores [$PARAMS_SANITIZE]
+   --strip                                                    Strip invalid characters in keys [$PARAMS_STRIP]
+   --upcase                                                   Force keys to uppercase [$PARAMS_UPCASE]
+   --debug                                                    Log additional debugging information [$PARAMS_DEBUG]
+   --silent                                                   Silence all logs [$PARAMS_SILENT]
+   --help, -h                                                 show help
+   --version, -v                                              print the version
 ```
 
 ## Building from source

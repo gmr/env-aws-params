@@ -7,7 +7,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.17
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.68.6
 	github.com/sirupsen/logrus v1.9.4
-	github.com/urfave/cli v1.22.17
+	github.com/urfave/cli/v3 v3.8.0
+	golang.org/x/sync v0.20.0
 )
 
 require (
@@ -23,7 +24,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.21 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.42.1 // indirect
 	github.com/aws/smithy-go v1.25.1 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	golang.org/x/sys v0.44.0 // indirect
 )

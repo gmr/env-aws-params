@@ -2,29 +2,11 @@ package main
 
 import (
 	"errors"
-	"flag"
-	"io"
 	"testing"
-
-	"github.com/urfave/cli"
 )
 
-func NewContext(t *testing.T, testArgs []string) *cli.Context {
-	app := cli.NewApp()
-	app.Writer = io.Discard
-	app.Flags = cliFlags()
-	set := flag.NewFlagSet("test", 0)
-	for _, f := range app.Flags {
-		f.Apply(set)
-	}
-	set.Parse(testArgs)
-	return cli.NewContext(app, set, nil)
-}
-
-func TestNoPrefixIsValid(t *testing.T) {
-	testArgs := []string{"--upcase", "/bin/bash"}
-
-	code, err := validateArgs(NewContext(t, testArgs))
+func TestValidateArgsNoPrefixIsValid(t *testing.T) {
+	code, err := validateArgs(1, false, false)
 	if code != 0 {
 		t.Fatalf("expected code to be 0, got %v", code)
 	}
@@ -33,12 +15,18 @@ func TestNoPrefixIsValid(t *testing.T) {
 	}
 }
 
-func TestMissingCommand(t *testing.T) {
-	var testArgs []string
+func TestValidateArgsMissingCommand(t *testing.T) {
+	code, err := validateArgs(0, false, false)
+	if code != 1 {
+		t.Fatalf("expected code to be 1, got %v", code)
+	}
+	if err == nil {
+		t.Fatalf("expected err to be set, got nil")
+	}
+}
 
-	testArgs = []string{"--prefix", "/foo"}
-
-	code, err := validateArgs(NewContext(t, testArgs))
+func TestValidateArgsStripAndSanitize(t *testing.T) {
+	code, err := validateArgs(1, true, true)
 	if code != 2 {
 		t.Fatalf("expected code to be 2, got %v", code)
 	}
@@ -47,31 +35,13 @@ func TestMissingCommand(t *testing.T) {
 	}
 }
 
-func TestMissingStripAndSanitize(t *testing.T) {
-	var testArgs []string
-
-	testArgs = []string{"--prefix", "/foo", "--strip", "--sanitize", "/bin/bash"}
-
-	code, err := validateArgs(NewContext(t, testArgs))
-	if code != 3 {
-		t.Fatalf("expected code to be 3, got %v", code)
-	}
-	if err == nil {
-		t.Fatalf("expected err to be set, got nil")
-	}
-}
-
-func TestValidCLIOptions(t *testing.T) {
-	var testArgs []string
-
-	testArgs = []string{"--prefix", "/foo", "--strip", "/bin/bash"}
-
-	code, err := validateArgs(NewContext(t, testArgs))
+func TestValidateArgsValid(t *testing.T) {
+	code, err := validateArgs(1, false, true)
 	if code != 0 {
 		t.Fatalf("expected code to be 0, got %v", code)
 	}
 	if err != nil {
-		t.Fatalf("expected err to be nil, got %v", code)
+		t.Fatalf("expected err to be nil, got %v", err)
 	}
 }
 
@@ -80,6 +50,6 @@ func TestErrorPrefix(t *testing.T) {
 	result := errorPrefix(testError)
 	expectation := "ERROR: foo bar"
 	if result != expectation {
-		t.Fatalf("expected \"%v\", got \"%v\"", result, expectation)
+		t.Fatalf("expected %q, got %q", expectation, result)
 	}
 }

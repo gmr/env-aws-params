@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -14,19 +13,13 @@ type SSMClient struct {
 	client *ssm.Client
 }
 
-func NewSSMClient(region string, profile string) (*SSMClient, error) {
-
-	var cfg aws.Config
-	var err error
-
-	ctx := context.TODO()
+func NewSSMClient(ctx context.Context, region string, profile string) (*SSMClient, error) {
+	opts := []func(*config.LoadOptions) error{}
 	if profile != "" {
-		cfg, err = config.LoadDefaultConfig(ctx,
-			config.WithSharedConfigProfile(profile),
-		)
-	} else {
-		cfg, err = config.LoadDefaultConfig(ctx)
+		opts = append(opts, config.WithSharedConfigProfile(profile))
 	}
+
+	cfg, err := config.LoadDefaultConfig(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -35,28 +28,26 @@ func NewSSMClient(region string, profile string) (*SSMClient, error) {
 		cfg.Region = region
 	}
 
-	client := ssm.NewFromConfig(cfg)
-	return &SSMClient{client}, nil
+	return &SSMClient{client: ssm.NewFromConfig(cfg)}, nil
 }
 
-func (c *SSMClient) GetParametersByPath(path string) (map[string]string, error) {
-	if strings.HasSuffix(path, "/") != true {
-		path = fmt.Sprintf("%s/", path)
+func (c *SSMClient) GetParametersByPath(ctx context.Context, path string) (map[string]string, error) {
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
 	}
 
 	var nextToken *string
 	parameters := make(map[string]string)
 
 	for {
-		params := &ssm.GetParametersByPathInput{
+		// MaxResults is capped at 10 by SSM for GetParametersByPath.
+		response, err := c.client.GetParametersByPath(ctx, &ssm.GetParametersByPathInput{
 			Path:           aws.String(path),
 			Recursive:      aws.Bool(true),
 			WithDecryption: aws.Bool(true),
 			MaxResults:     aws.Int32(10),
 			NextToken:      nextToken,
-		}
-		response, err := c.client.GetParametersByPath(context.TODO(), params)
-
+		})
 		if err != nil {
 			return nil, err
 		}
