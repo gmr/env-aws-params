@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"io"
+	"maps"
 	"os"
+	"os/exec"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -43,8 +45,7 @@ func action(ctx context.Context, cmd *cli.Command) error {
 
 	var envVars []string
 	if len(cmd.StringSlice("prefix")) > 0 {
-		var params map[string]string
-		params, err = getParameters(ctx, cmd)
+		params, err := getParameters(ctx, cmd)
 		if err != nil {
 			return cli.Exit(errorPrefix(err), -1)
 		}
@@ -71,9 +72,9 @@ func action(ctx context.Context, cmd *cli.Command) error {
 
 	args := cmd.Args()
 	if err := RunCommand(args.First(), args.Tail(), envVars); err != nil {
-		var cmdError *CommandFailedError
-		if errors.As(err, &cmdError) {
-			return cli.Exit(errorPrefix(err), cmdError.ExitCode)
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			return cli.Exit(errorPrefix(err), exitErr.ExitCode())
 		}
 		return cli.Exit(errorPrefix(err), 128)
 	}
@@ -159,13 +160,10 @@ func getParameters(ctx context.Context, cmd *cli.Command) (map[string]string, er
 		return nil, err
 	}
 
-	// Later prefixes override earlier ones, matching the prior sequential
-	// behavior when the same key is present under multiple prefixes.
+	// Later prefixes override earlier ones when keys collide.
 	values := make(map[string]string)
 	for _, m := range results {
-		for k, v := range m {
-			values[k] = v
-		}
+		maps.Copy(values, m)
 	}
 	return values, nil
 }
