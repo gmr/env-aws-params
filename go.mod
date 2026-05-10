@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.68.6
 	github.com/sirupsen/logrus v1.9.4
 	github.com/urfave/cli/v3 v3.8.0
+	golang.org/x/sync v0.20.0
 )
 
 require (

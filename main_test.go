@@ -17,8 +17,8 @@ func TestValidateArgsNoPrefixIsValid(t *testing.T) {
 
 func TestValidateArgsMissingCommand(t *testing.T) {
 	code, err := validateArgs(0, false, false)
-	if code != 2 {
-		t.Fatalf("expected code to be 2, got %v", code)
+	if code != 1 {
+		t.Fatalf("expected code to be 1, got %v", code)
 	}
 	if err == nil {
 		t.Fatalf("expected err to be set, got nil")
@@ -27,8 +27,8 @@ func TestValidateArgsMissingCommand(t *testing.T) {
 
 func TestValidateArgsStripAndSanitize(t *testing.T) {
 	code, err := validateArgs(1, true, true)
-	if code != 3 {
-		t.Fatalf("expected code to be 3, got %v", code)
+	if code != 2 {
+		t.Fatalf("expected code to be 2, got %v", code)
 	}
 	if err == nil {
 		t.Fatalf("expected err to be set, got nil")

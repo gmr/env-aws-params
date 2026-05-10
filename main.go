@@ -9,6 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
+	"golang.org/x/sync/errgroup"
 )
 
 var VersionString string
@@ -135,19 +136,34 @@ func errorPrefix(err error) string {
 }
 
 func getParameters(ctx context.Context, cmd *cli.Command) (map[string]string, error) {
-	values := make(map[string]string)
-
 	client, err := NewSSMClient(ctx, cmd.String("aws-region"), cmd.String("profile"))
 	if err != nil {
-		return values, err
+		return nil, err
 	}
 
-	for _, path := range cmd.StringSlice("prefix") {
-		params, err := client.GetParametersByPath(ctx, path)
-		if err != nil {
-			return values, err
-		}
-		for k, v := range params {
+	prefixes := cmd.StringSlice("prefix")
+	results := make([]map[string]string, len(prefixes))
+
+	g, gctx := errgroup.WithContext(ctx)
+	for i, path := range prefixes {
+		g.Go(func() error {
+			m, err := client.GetParametersByPath(gctx, path)
+			if err != nil {
+				return err
+			}
+			results[i] = m
+			return nil
+		})
+	}
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
+	// Later prefixes override earlier ones, matching the prior sequential
+	// behavior when the same key is present under multiple prefixes.
+	values := make(map[string]string)
+	for _, m := range results {
+		for k, v := range m {
 			values[k] = v
 		}
 	}
@@ -156,11 +172,11 @@ func getParameters(ctx context.Context, cmd *cli.Command) (map[string]string, er
 
 func validateArgs(nargs int, sanitize, strip bool) (int, error) {
 	if nargs == 0 {
-		return 2, errors.New("command not specified")
+		return 1, errors.New("command not specified")
 	}
 
 	if sanitize && strip {
-		return 3, errors.New("--sanitize and --strip are mutually exclusive behaviors")
+		return 2, errors.New("--sanitize and --strip are mutually exclusive behaviors")
 	}
 
 	return 0, nil
