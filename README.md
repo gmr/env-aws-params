@@ -18,6 +18,56 @@ The primary goal is to provide a way of injecting environment variables for
 in the SSM Parameter store. It was directly inspired by
 [envconsul](https://github.com/hashicorp/envconsul).
 
+## Installation
+
+### Pre-built binaries
+
+Static binaries for `linux/amd64`, `linux/arm64`, `darwin/amd64`, and `darwin/arm64`
+are attached to each [GitHub Release](https://github.com/gmr/env-aws-params/releases).
+
+```bash
+VERSION=v1.1.0   # pick from the releases page
+OS=$(uname | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+
+curl -fL "https://github.com/gmr/env-aws-params/releases/download/${VERSION}/env-aws-params_${OS}-${ARCH}" \
+  -o /usr/local/bin/env-aws-params
+chmod +x /usr/local/bin/env-aws-params
+```
+
+### Docker
+
+Multi-arch container images (`linux/amd64`, `linux/arm64`) are published to
+the GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/gmr/env-aws-params:latest
+```
+
+Available tags:
+
+- `latest` — most recent commit on `main`
+- `main` — alias for `latest`
+- `<version>`, `<major>.<minor>`, `<major>` — tagged releases (e.g. `1.1.0`, `1.1`, `1`)
+
+The image's entrypoint is `env-aws-params`, so flags and the wrapped command go directly to `docker run`:
+
+```bash
+docker run --rm \
+  -v "$HOME/.aws:/root/.aws:ro" \
+  -e AWS_PROFILE \
+  ghcr.io/gmr/env-aws-params:latest \
+  --prefix /service-prefix /bin/sh -c env
+```
+
+Or use it as a base image to wrap your own app:
+
+```dockerfile
+FROM ghcr.io/gmr/env-aws-params:latest
+COPY my-app /usr/local/bin/my-app
+CMD ["my-app"]
+```
+
 ## Example Usage
 
 Create parameters in Parameter Store:
@@ -73,19 +123,17 @@ GLOBAL OPTIONS:
    --version, -v             print the version
 ```
 
-## Building
+## Building from source
 
-This project uses [go modules](https://go.dev/blog/using-go-modules). To build the project:
+This project uses [Go modules](https://go.dev/blog/using-go-modules) and requires Go 1.26+.
 
 ```bash
 go mod download
-go mod verify
 go build
 ```
 
-Building an environment is also provided as a docker image based on Alpine Linux. See the Dockerfile for more information.
+Or build the Docker image locally:
 
 ```bash
-docker build -t env-aws-params; # Build the image
-docker run --rm -it -v $HOME/.aws/:/root/.aws/ env-aws-params [your options]
+docker build -t env-aws-params .
 ```
