@@ -1,6 +1,6 @@
 # env-aws-params
 
-[![Build Status](https://travis-ci.org/gmr/env-aws-params.svg?branch=master)](https://travis-ci.org/gmr/env-aws-params)
+[![CI](https://github.com/gmr/env-aws-params/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gmr/env-aws-params/actions/workflows/ci.yml)
 
 ``env-aws-params`` is a tool that injects AWS EC2 Systems Manager (SSM)
 [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html)
