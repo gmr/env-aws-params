@@ -125,20 +125,18 @@ NAME:
 USAGE:
    env-aws-params [global options] -p prefix command [command arguments]
 
-COMMANDS:
-     help, h  Shows a list of commands or help for one command
-
 GLOBAL OPTIONS:
-   --aws-region value        The AWS region to use for the Parameter Store API [$AWS_REGION]
-   --prefix value, -p value  Key prefix that is used to retrieve the environment variables - supports multiple use
-   --pristine                Only use values retrieved from Parameter Store, do not inherit the existing environment variables
-   --sanitize                Replace invalid characters in keys to underscores
-   --strip                   Strip invalid characters in keys
-   --upcase                  Force keys to uppercase
-   --debug                   Log additional debugging information [$PARAMS_DEBUG]
-   --silent                  Silence all logs [$PARAMS_SILENT]
-   --help, -h                show help
-   --version, -v             print the version
+   --aws-region string                                        The AWS region to use for the Parameter Store API [$AWS_REGION]
+   --profile string                                           Optional AWS profile to use for the Parameter Store API [$AWS_PROFILE]
+   --prefix string, -p string [ --prefix string, -p string ]  Key prefix that is used to retrieve the environment variables - supports multiple use [$PARAMS_PREFIX]
+   --pristine                                                 Only use values retrieved from Parameter Store, do not inherit the existing environment variables [$PARAMS_PRISTINE]
+   --sanitize                                                 Replace invalid characters in keys to underscores [$PARAMS_SANITIZE]
+   --strip                                                    Strip invalid characters in keys [$PARAMS_STRIP]
+   --upcase                                                   Force keys to uppercase [$PARAMS_UPCASE]
+   --debug                                                    Log additional debugging information [$PARAMS_DEBUG]
+   --silent                                                   Silence all logs [$PARAMS_SILENT]
+   --help, -h                                                 show help
+   --version, -v                                              print the version
 ```
 
 ## Building from source
