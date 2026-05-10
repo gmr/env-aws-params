@@ -1,5 +1,5 @@
 PKG_NAME := env-aws-params
-PLATFORMS := linux-amd64 linux-arm64 darwin-amd64 darwin-arm64
+PLATFORMS := linux-amd64 linux-arm64 darwin-arm64
 VERSION ?= 0.0.0
 
 TARGETS = $(addprefix target/$(PKG_NAME)_,$(PLATFORMS))

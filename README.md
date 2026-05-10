@@ -22,7 +22,7 @@ in the SSM Parameter store. It was directly inspired by
 
 ### Pre-built binaries
 
-Static binaries for `linux/amd64`, `linux/arm64`, `darwin/amd64`, and `darwin/arm64`
+Static binaries for `linux/amd64`, `linux/arm64`, and `darwin/arm64`
 are attached to each [GitHub Release](https://github.com/gmr/env-aws-params/releases).
 
 ```bash

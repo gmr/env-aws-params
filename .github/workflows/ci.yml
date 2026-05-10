@@ -32,8 +32,6 @@ jobs:
           - goos: linux
             goarch: arm64
           - goos: darwin
-            goarch: amd64
-          - goos: darwin
             goarch: arm64
     steps:
       - uses: actions/checkout@v6
