@@ -48,19 +48,24 @@ func action(c *cli.Context) error {
 		return cli.NewExitError(errorPrefix(err), code)
 	}
 
-	params, err := getParameters(c)
-	if err != nil {
-		return cli.NewExitError(errorPrefix(err), -1)
-	}
+	var envVars []string
+	if len(c.GlobalStringSlice("prefix")) > 0 {
+		params, err := getParameters(c)
+		if err != nil {
+			return cli.NewExitError(errorPrefix(err), -1)
+		}
 
-	envVars := BuildEnvVars(
-		params,
-		c.GlobalBool("sanitize"),
-		c.GlobalBool("strip"),
-		c.GlobalBool("upcase"))
+		envVars = BuildEnvVars(
+			params,
+			c.GlobalBool("sanitize"),
+			c.GlobalBool("strip"),
+			c.GlobalBool("upcase"))
 
-	for _, v := range envVars {
-		log.Debugf("Setting %s", v)
+		for _, v := range envVars {
+			log.Debugf("Setting %s", v)
+		}
+	} else {
+		log.Warn("No prefix set; executing command without retrieving SSM parameters")
 	}
 
 	if c.GlobalBool("pristine") == false {
@@ -153,10 +158,6 @@ func getParameters(c *cli.Context) (map[string]string, error) {
 }
 
 func validateArgs(c *cli.Context) (int, error) {
-	if len(c.GlobalStringSlice("prefix")) == 0 {
-		return 1, errors.New("prefix is required")
-	}
-
 	if c.NArg() == 0 {
 		return 2, errors.New("command not specified")
 	}

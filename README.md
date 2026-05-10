@@ -9,6 +9,10 @@ when executing an application. It is intended to be used as a Docker
 [Entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint),
 but can really be used to launch applications outside of Docker as well.
 
+If no ``--prefix`` is set, the command is executed with the existing environment
+unchanged — ``env-aws-params`` will not contact SSM. This makes it safe to wire
+in as a Docker entrypoint that's only active when ``PARAMS_PREFIX`` is set.
+
 The primary goal is to provide a way of injecting environment variables for
 [12 Factor](https://12factor.net) applications that have their configuration defined
 in the SSM Parameter store. It was directly inspired by

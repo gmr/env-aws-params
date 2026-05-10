@@ -21,17 +21,15 @@ func NewContext(t *testing.T, testArgs []string) *cli.Context {
 	return cli.NewContext(app, set, nil)
 }
 
-func TestMissingPrefix(t *testing.T) {
-	var testArgs []string
-
-	testArgs = []string{"--upcase"}
+func TestNoPrefixIsValid(t *testing.T) {
+	testArgs := []string{"--upcase", "/bin/bash"}
 
 	code, err := validateArgs(NewContext(t, testArgs))
-	if code != 1 {
-		t.Fatalf("expected code to be 1, got %v", code)
+	if code != 0 {
+		t.Fatalf("expected code to be 0, got %v", code)
 	}
-	if err == nil {
-		t.Fatalf("expected err to be set, got nil")
+	if err != nil {
+		t.Fatalf("expected err to be nil, got %v", err)
 	}
 }
 
