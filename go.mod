@@ -3,26 +3,27 @@ module env-aws-params
 go 1.26
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.17.4
-	github.com/aws/aws-sdk-go-v2/config v1.18.12
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.35.2
-	github.com/sirupsen/logrus v1.9.3
-	github.com/urfave/cli v1.22.12
+	github.com/aws/aws-sdk-go-v2 v1.41.7
+	github.com/aws/aws-sdk-go-v2/config v1.32.17
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.68.6
+	github.com/sirupsen/logrus v1.9.4
+	github.com/urfave/cli v1.22.17
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.12 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.22 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.28 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.22 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.29 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.22 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.12.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.18.3 // indirect
-	github.com/aws/smithy-go v1.13.5 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.16 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.23 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.23 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.23 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.24 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.23 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.0.11 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.30.17 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.21 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.42.1 // indirect
+	github.com/aws/smithy-go v1.25.1 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
 )
