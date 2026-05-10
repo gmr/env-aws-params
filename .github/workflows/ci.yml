@@ -14,8 +14,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.23'
       - run: go test ./...
@@ -36,8 +36,8 @@ jobs:
           - goos: darwin
             goarch: arm64
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.23'
       - name: Build
@@ -54,7 +54,7 @@ jobs:
           mkdir -p dist
           BIN="env-aws-params_${{ matrix.goos }}-${{ matrix.goarch }}"
           go build -trimpath -ldflags "-w -s -X main.VersionString=${VERSION}" -o "dist/${BIN}" .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: env-aws-params_${{ matrix.goos }}-${{ matrix.goarch }}
           path: dist/env-aws-params_${{ matrix.goos }}-${{ matrix.goarch }}
@@ -65,11 +65,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: dist/*
           generate_release_notes: true
