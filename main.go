@@ -2,12 +2,12 @@ package main
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"os"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"strings"
 )
 
 var VersionString string
@@ -38,7 +38,7 @@ func action(c *cli.Context) error {
 		log.SetLevel(log.DebugLevel)
 	}
 	if c.GlobalBool("silent") {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	} else {
 		log.SetOutput(os.Stdout)
 	}
@@ -62,14 +62,17 @@ func action(c *cli.Context) error {
 			c.GlobalBool("upcase"))
 
 		for _, v := range envVars {
-			log.Debugf("Setting %s", v)
+			key, _, _ := strings.Cut(v, "=")
+			log.Debugf("Setting %s", key)
 		}
 	} else {
 		log.Warn("No prefix set; executing command without retrieving SSM parameters")
 	}
 
-	if c.GlobalBool("pristine") == false {
-		envVars = append(os.Environ(), envVars...)
+	// SSM-derived values come first so they win over inherited environ:
+	// glibc/musl/Apple libc all return the first match from getenv().
+	if !c.GlobalBool("pristine") {
+		envVars = append(envVars, os.Environ()...)
 	}
 
 	err = RunCommand(c.Args()[0], c.Args()[1:], envVars)

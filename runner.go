@@ -43,20 +43,15 @@ func RunCommand(command string, args []string, envVars []string) error {
 		syscall.SIGQUIT)
 	go func() {
 		sigv := <-sigc
+		var killErr error
 		switch sigv {
-		case syscall.SIGHUP:
-			err = syscall.Kill(-os.Getpid(), syscall.SIGHUP)
-		case syscall.SIGINT:
-			err = syscall.Kill(-os.Getpid(), syscall.SIGINT)
-		case syscall.SIGTERM:
-			err = syscall.Kill(-os.Getpid(), syscall.SIGTERM)
-		case syscall.SIGQUIT:
-			err = syscall.Kill(-os.Getpid(), syscall.SIGQUIT)
+		case syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
+			killErr = syscall.Kill(-os.Getpid(), sigv.(syscall.Signal))
 		default:
-			err = syscall.Kill(-os.Getpid(), syscall.SIGTERM)
+			killErr = syscall.Kill(-os.Getpid(), syscall.SIGTERM)
 		}
 		log.WithFields(log.Fields{
-			"err":    err,
+			"err":    killErr,
 			"proc":   proc,
 			"pid":    -proc.Pid,
 			"signal": sigv},

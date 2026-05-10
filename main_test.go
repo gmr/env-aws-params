@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"flag"
-	"io/ioutil"
+	"io"
 	"testing"
 
 	"github.com/urfave/cli"
@@ -11,7 +11,7 @@ import (
 
 func NewContext(t *testing.T, testArgs []string) *cli.Context {
 	app := cli.NewApp()
-	app.Writer = ioutil.Discard
+	app.Writer = io.Discard
 	app.Flags = cliFlags()
 	set := flag.NewFlagSet("test", 0)
 	for _, f := range app.Flags {

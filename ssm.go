@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
-	log "github.com/sirupsen/logrus"
 )
 
 type SSMClient struct {
@@ -59,7 +58,6 @@ func (c *SSMClient) GetParametersByPath(path string) (map[string]string, error) 
 		response, err := c.client.GetParametersByPath(context.TODO(), params)
 
 		if err != nil {
-			log.Errorf("Error Getting Parameters from SSM: %s", err)
 			return nil, err
 		}
 
