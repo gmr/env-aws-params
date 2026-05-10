@@ -12,10 +12,6 @@ import (
 
 var VersionString string
 
-func init() {
-	log.SetLevel(log.InfoLevel)
-}
-
 func main() {
 	app := cli.NewApp()
 	app.Name = "env-aws-params"
@@ -39,8 +35,6 @@ func action(c *cli.Context) error {
 	}
 	if c.GlobalBool("silent") {
 		log.SetOutput(io.Discard)
-	} else {
-		log.SetOutput(os.Stdout)
 	}
 
 	code, err := validateArgs(c)
@@ -50,7 +44,8 @@ func action(c *cli.Context) error {
 
 	var envVars []string
 	if len(c.GlobalStringSlice("prefix")) > 0 {
-		params, err := getParameters(c)
+		var params map[string]string
+		params, err = getParameters(c)
 		if err != nil {
 			return cli.NewExitError(errorPrefix(err), -1)
 		}
@@ -137,7 +132,7 @@ func cliFlags() []cli.Flag {
 }
 
 func errorPrefix(err error) string {
-	return strings.Join([]string{"ERROR:", err.Error()}, " ")
+	return "ERROR: " + err.Error()
 }
 
 func getParameters(c *cli.Context) (map[string]string, error) {
@@ -165,7 +160,7 @@ func validateArgs(c *cli.Context) (int, error) {
 		return 2, errors.New("command not specified")
 	}
 
-	if c.GlobalBool("sanitize") == true && c.GlobalBool("strip") == true {
+	if c.GlobalBool("sanitize") && c.GlobalBool("strip") {
 		return 3, errors.New("--sanitize and --strip are mutually exclusive behaviors")
 	}
 

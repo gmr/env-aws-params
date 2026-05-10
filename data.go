@@ -13,13 +13,13 @@ func BuildEnvVars(parameters map[string]string, sanitize bool, strip bool, upcas
 	var vars []string
 
 	for k, v := range parameters {
-		if sanitize == true {
+		if sanitize {
 			k = InvalidPattern.ReplaceAllString(k, "_")
 		}
-		if strip == true {
+		if strip {
 			k = InvalidPattern.ReplaceAllString(k, "")
 		}
-		if upcase == true {
+		if upcase {
 			k = strings.ToUpper(k)
 		}
 		vars = append(vars, fmt.Sprintf("%s=%s", k, v))

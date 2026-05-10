@@ -21,7 +21,7 @@ func (e *CommandFailedError) Error() string {
 func RunCommand(command string, args []string, envVars []string) error {
 
 	log.Infof("PID %v running %s %s", os.Getpid(), command,
-		strings.Join(args[:], " "))
+		strings.Join(args, " "))
 
 	procAttr := new(os.ProcAttr)
 	procAttr.Env = envVars

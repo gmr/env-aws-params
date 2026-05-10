@@ -12,7 +12,7 @@ func AssertEqual(t *testing.T, value []string, expect []string) {
 	}
 	sort.Strings(value)
 	sort.Strings(expect)
-	for i, _ := range value {
+	for i := range value {
 		if value[i] != expect[i] {
 			t.Error(fmt.Sprintf("Values at offset %v do not match", i), value[i], expect[i])
 		}
