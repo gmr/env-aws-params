@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -19,8 +20,15 @@ func (e *CommandFailedError) Error() string {
 }
 
 func RunCommand(command string, args []string, envVars []string) error {
+	// Resolve command against $PATH so callers can pass bare names like "ls"
+	// rather than absolute paths. Absolute / relative paths pass through
+	// unchanged after an existence + executable-bit check.
+	resolved, err := exec.LookPath(command)
+	if err != nil {
+		return err
+	}
 
-	log.Infof("PID %v running %s %s", os.Getpid(), command,
+	log.Infof("PID %v running %s %s", os.Getpid(), resolved,
 		strings.Join(args, " "))
 
 	procAttr := new(os.ProcAttr)
@@ -30,8 +38,8 @@ func RunCommand(command string, args []string, envVars []string) error {
 	// prefix args with the command, as per https://golang.org/pkg/os/#StartProcess
 	// The argv slice will become os.Args in the new process, so it normally starts
 	// with the program name.
-	args = append([]string{command}, args...)
-	proc, err := os.StartProcess(command, args, procAttr)
+	args = append([]string{resolved}, args...)
+	proc, err := os.StartProcess(resolved, args, procAttr)
 	if err != nil {
 		return err
 	}
