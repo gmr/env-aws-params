@@ -12,6 +12,12 @@ import (
 
 func RunCommand(command string, args []string, envVars []string) error {
 	cmd := exec.Command(command, args...)
+
+	// A nil Env makes os/exec hand the child the parent's environment, which
+	// would silently defeat --pristine when there is nothing to inject.
+	if envVars == nil {
+		envVars = []string{}
+	}
 	cmd.Env = envVars
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

@@ -64,11 +64,13 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		log.Warn("No prefix set; executing command without retrieving SSM parameters")
 	}
 
-	// SSM-derived values come first so they win over inherited environ:
-	// glibc/musl/Apple libc all return the first match from getenv().
-	if !cmd.Bool("pristine") {
-		envVars = append(envVars, os.Environ()...)
+	// SSM-derived values are merged last so they win over the inherited
+	// environment; --pristine inherits nothing at all. See MergeEnvVars.
+	environ := os.Environ()
+	if cmd.Bool("pristine") {
+		environ = nil
 	}
+	envVars = MergeEnvVars(envVars, environ)
 
 	args := cmd.Args()
 	if err := RunCommand(args.First(), args.Tail(), envVars); err != nil {
