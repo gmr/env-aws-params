@@ -37,10 +37,10 @@ func RunCommand(command string, args []string, envVars []string) error {
 		syscall.SIGQUIT)
 	go func() {
 		for sigv := range sigc {
-			killErr := syscall.Kill(-os.Getpid(), sigv.(syscall.Signal))
+			sigErr := cmd.Process.Signal(sigv)
 			log.WithFields(log.Fields{
-				"err":    killErr,
-				"pid":    -cmd.Process.Pid,
+				"err":    sigErr,
+				"pid":    cmd.Process.Pid,
 				"signal": sigv,
 			}).Info("Caught signal, sent to child")
 		}
