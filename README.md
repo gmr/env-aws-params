@@ -142,6 +142,16 @@ GLOBAL OPTIONS:
    --version, -v                                              print the version
 ```
 
+## Exit codes
+
+The wrapped command's exit code is passed through unchanged. ``env-aws-params``
+itself uses:
+
+- ``125`` — invalid usage or a Parameter Store error
+- ``126`` — the command was found but could not be started
+- ``127`` — the command was not found
+- ``128+N`` — the command was killed by signal ``N`` (e.g. ``143`` for ``SIGTERM``)
+
 ## Building from source
 
 This project uses [Go modules](https://go.dev/blog/using-go-modules) and requires Go 1.26+.

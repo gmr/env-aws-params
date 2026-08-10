@@ -43,16 +43,15 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		log.SetOutput(io.Discard)
 	}
 
-	code, err := validateArgs(cmd.NArg(), cmd.Bool("sanitize"), cmd.Bool("strip"))
-	if code > 0 {
-		return cli.Exit(errorPrefix(err), code)
+	if err := validateArgs(cmd.NArg(), cmd.Bool("sanitize"), cmd.Bool("strip")); err != nil {
+		return cli.Exit(errorPrefix(err), 125)
 	}
 
 	var envVars []string
 	if len(cmd.StringSlice("prefix")) > 0 {
 		params, err := getParameters(ctx, cmd)
 		if err != nil {
-			return cli.Exit(errorPrefix(err), -1)
+			return cli.Exit(errorPrefix(err), 125)
 		}
 
 		envVars = BuildEnvVars(
@@ -87,7 +86,10 @@ func action(ctx context.Context, cmd *cli.Command) error {
 			}
 			return cli.Exit(errorPrefix(err), code)
 		}
-		return cli.Exit(errorPrefix(err), 128)
+		if errors.Is(err, exec.ErrNotFound) || errors.Is(err, os.ErrNotExist) {
+			return cli.Exit(errorPrefix(err), 127)
+		}
+		return cli.Exit(errorPrefix(err), 126)
 	}
 	return nil
 }
@@ -179,14 +181,14 @@ func getParameters(ctx context.Context, cmd *cli.Command) (map[string]string, er
 	return values, nil
 }
 
-func validateArgs(nargs int, sanitize, strip bool) (int, error) {
+func validateArgs(nargs int, sanitize, strip bool) error {
 	if nargs == 0 {
-		return 1, errors.New("command not specified")
+		return errors.New("command not specified")
 	}
 
 	if sanitize && strip {
-		return 2, errors.New("--sanitize and --strip are mutually exclusive behaviors")
+		return errors.New("--sanitize and --strip are mutually exclusive behaviors")
 	}
 
-	return 0, nil
+	return nil
 }
