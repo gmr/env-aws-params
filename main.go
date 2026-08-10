@@ -15,7 +15,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-var VersionString string
+var VersionString = "dev"
 
 func main() {
 	// Stop flag parsing at the wrapped command, so its own flags
