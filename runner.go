@@ -23,18 +23,21 @@ func RunCommand(command string, args []string, envVars []string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Start(); err != nil {
-		return err
-	}
-
-	log.Infof("PID %v running %s %s", cmd.Process.Pid, cmd.Path, strings.Join(args, " "))
-
+	// Signals arriving before Start queue up in the channel and are forwarded
+	// once the child is running.
 	sigc := make(chan os.Signal, 32)
 	signal.Notify(sigc,
 		syscall.SIGHUP,
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	log.Infof("PID %v running %s %s", cmd.Process.Pid, cmd.Path, strings.Join(args, " "))
+
 	go func() {
 		for sigv := range sigc {
 			sigErr := cmd.Process.Signal(sigv)
