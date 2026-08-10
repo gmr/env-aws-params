@@ -26,11 +26,7 @@ func RunCommand(command string, args []string, envVars []string) error {
 	// Signals arriving before Start queue up in the channel and are forwarded
 	// once the child is running.
 	sigc := make(chan os.Signal, 32)
-	signal.Notify(sigc,
-		syscall.SIGHUP,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-		syscall.SIGQUIT)
+	signal.Notify(sigc)
 
 	if err := cmd.Start(); err != nil {
 		return err
@@ -40,12 +36,16 @@ func RunCommand(command string, args []string, envVars []string) error {
 
 	go func() {
 		for sigv := range sigc {
+			// SIGCHLD is for the wrapper itself; SIGURG is used by the Go runtime.
+			if sigv == syscall.SIGCHLD || sigv == syscall.SIGURG {
+				continue
+			}
 			sigErr := cmd.Process.Signal(sigv)
 			log.WithFields(log.Fields{
 				"err":    sigErr,
 				"pid":    cmd.Process.Pid,
 				"signal": sigv,
-			}).Info("Caught signal, sent to child")
+			}).Debug("Forwarded signal to child")
 		}
 	}()
 
