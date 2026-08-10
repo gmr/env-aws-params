@@ -1,10 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"maps"
 	"regexp"
-	"sort"
+	"slices"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var InvalidPattern = regexp.MustCompile(`[^a-zA-Z0-9_]`)
@@ -25,20 +27,31 @@ func MergeEnvVars(ssmVars []string, environ []string) []string {
 }
 
 func BuildEnvVars(parameters map[string]string, sanitize bool, strip bool, upcase bool) []string {
-	var vars []string
-
-	for k, v := range parameters {
+	// Transform in sorted parameter order so collisions resolve deterministically.
+	values := make(map[string]string, len(parameters))
+	sources := make(map[string]string, len(parameters))
+	for _, name := range slices.Sorted(maps.Keys(parameters)) {
+		key := name
 		if sanitize {
-			k = InvalidPattern.ReplaceAllString(k, "_")
+			key = InvalidPattern.ReplaceAllString(key, "_")
 		}
 		if strip {
-			k = InvalidPattern.ReplaceAllString(k, "")
+			key = InvalidPattern.ReplaceAllString(key, "")
 		}
 		if upcase {
-			k = strings.ToUpper(k)
+			key = strings.ToUpper(key)
 		}
-		vars = append(vars, fmt.Sprintf("%s=%s", k, v))
+		if prev, ok := sources[key]; ok {
+			log.Warnf("Parameters %q and %q both map to %s; keeping the value of %q", prev, name, key, name)
+		}
+		sources[key] = name
+		values[key] = parameters[name]
 	}
-	sort.Strings(vars)
+
+	vars := make([]string, 0, len(values))
+	for key, value := range values {
+		vars = append(vars, key+"="+value)
+	}
+	slices.Sort(vars)
 	return vars
 }

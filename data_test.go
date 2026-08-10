@@ -110,6 +110,16 @@ func TestBuildEnvVarsUpperSanitize(t *testing.T) {
 	AssertEqual(t, envVars, expectation)
 }
 
+func TestBuildEnvVarsCollisionKeepsLastSortedParameter(t *testing.T) {
+	params := map[string]string{
+		"db-host": "from-dash",
+		"db_host": "from-underscore",
+	}
+
+	envVars := BuildEnvVars(params, true, false, true)
+	AssertEqual(t, envVars, []string{"DB_HOST=from-underscore"})
+}
+
 func TestBuildEnvVarsUpperStrip(t *testing.T) {
 	var params map[string]string
 
