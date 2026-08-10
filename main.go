@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
@@ -76,7 +77,11 @@ func action(ctx context.Context, cmd *cli.Command) error {
 	if err := RunCommand(args.First(), args.Tail(), envVars); err != nil {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
-			return cli.Exit(errorPrefix(err), exitErr.ExitCode())
+			code := exitErr.ExitCode()
+			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok && status.Signaled() {
+				code = 128 + int(status.Signal())
+			}
+			return cli.Exit(errorPrefix(err), code)
 		}
 		return cli.Exit(errorPrefix(err), 128)
 	}
