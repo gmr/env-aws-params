@@ -29,20 +29,21 @@ func RunCommand(command string, args []string, envVars []string) error {
 
 	log.Infof("PID %v running %s %s", cmd.Process.Pid, cmd.Path, strings.Join(args, " "))
 
-	sigc := make(chan os.Signal, 1)
+	sigc := make(chan os.Signal, 32)
 	signal.Notify(sigc,
 		syscall.SIGHUP,
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
 	go func() {
-		sigv := <-sigc
-		killErr := syscall.Kill(-os.Getpid(), sigv.(syscall.Signal))
-		log.WithFields(log.Fields{
-			"err":    killErr,
-			"pid":    -cmd.Process.Pid,
-			"signal": sigv,
-		}).Info("Caught signal, sent to child")
+		for sigv := range sigc {
+			killErr := syscall.Kill(-os.Getpid(), sigv.(syscall.Signal))
+			log.WithFields(log.Fields{
+				"err":    killErr,
+				"pid":    -cmd.Process.Pid,
+				"signal": sigv,
+			}).Info("Caught signal, sent to child")
+		}
 	}()
 
 	return cmd.Wait()
