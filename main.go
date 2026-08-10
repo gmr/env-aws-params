@@ -18,13 +18,17 @@ import (
 var VersionString string
 
 func main() {
+	// Stop flag parsing at the wrapped command, so its own flags
+	// (e.g. sh -c) are passed through instead of rejected.
+	stopOnFirstArg := 1
 	cmd := &cli.Command{
-		Name:      "env-aws-params",
-		Usage:     "Application entry-point that injects SSM Parameter Store values as Environment Variables",
-		UsageText: "env-aws-params [global options] -p prefix command [command arguments]",
-		Version:   VersionString,
-		Flags:     cliFlags(),
-		Action:    action,
+		Name:         "env-aws-params",
+		Usage:        "Application entry-point that injects SSM Parameter Store values as Environment Variables",
+		UsageText:    "env-aws-params [global options] -p prefix command [command arguments]",
+		Version:      VersionString,
+		Flags:        cliFlags(),
+		Action:       action,
+		StopOnNthArg: &stopOnFirstArg,
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
