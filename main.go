@@ -29,6 +29,11 @@ func main() {
 		Flags:        cliFlags(),
 		Action:       action,
 		StopOnNthArg: &stopOnFirstArg,
+		// Flag parsing errors never reach action, so they are mapped to
+		// the documented usage-error exit code here.
+		OnUsageError: func(_ context.Context, _ *cli.Command, err error, _ bool) error {
+			return cli.Exit(errorPrefix(err), 125)
+		},
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
