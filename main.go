@@ -8,22 +8,32 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/sync/errgroup"
 )
 
-var VersionString string
+var VersionString = "dev"
 
 func main() {
+	// Stop flag parsing at the wrapped command, so its own flags
+	// (e.g. sh -c) are passed through instead of rejected.
+	stopOnFirstArg := 1
 	cmd := &cli.Command{
-		Name:      "env-aws-params",
-		Usage:     "Application entry-point that injects SSM Parameter Store values as Environment Variables",
-		UsageText: "env-aws-params [global options] -p prefix command [command arguments]",
-		Version:   VersionString,
-		Flags:     cliFlags(),
-		Action:    action,
+		Name:         "env-aws-params",
+		Usage:        "Application entry-point that injects SSM Parameter Store values as Environment Variables",
+		UsageText:    "env-aws-params [global options] -p prefix command [command arguments]",
+		Version:      VersionString,
+		Flags:        cliFlags(),
+		Action:       action,
+		StopOnNthArg: &stopOnFirstArg,
+		// Flag parsing errors never reach action, so they are mapped to
+		// the documented usage-error exit code here.
+		OnUsageError: func(_ context.Context, _ *cli.Command, err error, _ bool) error {
+			return cli.Exit(errorPrefix(err), 125)
+		},
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
@@ -38,16 +48,15 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		log.SetOutput(io.Discard)
 	}
 
-	code, err := validateArgs(cmd.NArg(), cmd.Bool("sanitize"), cmd.Bool("strip"))
-	if code > 0 {
-		return cli.Exit(errorPrefix(err), code)
+	if err := validateArgs(cmd.NArg(), cmd.Bool("sanitize"), cmd.Bool("strip")); err != nil {
+		return cli.Exit(errorPrefix(err), 125)
 	}
 
 	var envVars []string
 	if len(cmd.StringSlice("prefix")) > 0 {
 		params, err := getParameters(ctx, cmd)
 		if err != nil {
-			return cli.Exit(errorPrefix(err), -1)
+			return cli.Exit(errorPrefix(err), 125)
 		}
 
 		envVars = BuildEnvVars(
@@ -64,19 +73,28 @@ func action(ctx context.Context, cmd *cli.Command) error {
 		log.Warn("No prefix set; executing command without retrieving SSM parameters")
 	}
 
-	// SSM-derived values come first so they win over inherited environ:
-	// glibc/musl/Apple libc all return the first match from getenv().
-	if !cmd.Bool("pristine") {
-		envVars = append(envVars, os.Environ()...)
+	// SSM-derived values are merged last so they win over the inherited
+	// environment; --pristine inherits nothing at all. See MergeEnvVars.
+	environ := os.Environ()
+	if cmd.Bool("pristine") {
+		environ = nil
 	}
+	envVars = MergeEnvVars(envVars, environ)
 
 	args := cmd.Args()
 	if err := RunCommand(args.First(), args.Tail(), envVars); err != nil {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
-			return cli.Exit(errorPrefix(err), exitErr.ExitCode())
+			code := exitErr.ExitCode()
+			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok && status.Signaled() {
+				code = 128 + int(status.Signal())
+			}
+			return cli.Exit(errorPrefix(err), code)
 		}
-		return cli.Exit(errorPrefix(err), 128)
+		if errors.Is(err, exec.ErrNotFound) || errors.Is(err, os.ErrNotExist) {
+			return cli.Exit(errorPrefix(err), 127)
+		}
+		return cli.Exit(errorPrefix(err), 126)
 	}
 	return nil
 }
@@ -168,14 +186,14 @@ func getParameters(ctx context.Context, cmd *cli.Command) (map[string]string, er
 	return values, nil
 }
 
-func validateArgs(nargs int, sanitize, strip bool) (int, error) {
+func validateArgs(nargs int, sanitize, strip bool) error {
 	if nargs == 0 {
-		return 1, errors.New("command not specified")
+		return errors.New("command not specified")
 	}
 
 	if sanitize && strip {
-		return 2, errors.New("--sanitize and --strip are mutually exclusive behaviors")
+		return errors.New("--sanitize and --strip are mutually exclusive behaviors")
 	}
 
-	return 0, nil
+	return nil
 }

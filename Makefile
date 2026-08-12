@@ -30,7 +30,7 @@ $(TARGETS): go.mod
 	make $(platform)
 
 test: deps
-	$(GO) test
+	$(GO) test -race ./...
 
 fmt:
 	$(GO) fmt
