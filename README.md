@@ -154,7 +154,7 @@ itself uses:
 
 ## Building from source
 
-This project uses [Go modules](https://go.dev/blog/using-go-modules) and requires Go 1.26+.
+This project uses [Go modules](https://go.dev/blog/using-go-modules) and requires Go 1.26.5+.
 
 ```bash
 go mod download

@@ -1,8 +1,6 @@
 module env-aws-params
 
-go 1.26
-
-toolchain go1.26.5
+go 1.26.5
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.7
